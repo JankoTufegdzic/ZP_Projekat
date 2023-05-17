@@ -1,9 +1,24 @@
+import datetime
+
 from cryptography.hazmat.primitives import hashes
 from Crypto.Cipher import CAST
 import rsa
 
+class PrivateRingStruct:
+    def __init__(self, pu, pr, alg, password):
+        self.timestamp = datetime.datetime.now()
+        self.pu = pu
+        self.pr = pr
+        self.alg = alg
+        self.password = password
 
+    def __str__(self):
+        return "ts: " + str(self.timestamp) + ", PU: " + str(self.pu) + ", PR: " + str(self.pr) + ", alg: " + self.alg
 
+#{userID:janko@gmam. ring:[{puId:.... , }.{}]}
+
+publicRing = {}
+privateRing = {}
 
 def generateKeysRSA(size):
     return rsa.newkeys(size)
@@ -41,7 +56,8 @@ def generateKeys():
     digest = hashes.Hash(hashes.SHA1())
     ba=bytearray(password.encode('utf-8'))
     digest.update(ba)
-    hashedPassword=(digest.finalize())[-16:]
+    hp = (digest.finalize())
+    hashedPassword=hp[-16:]
     print(hashedPassword)
 
     cipher=CAST.new(hashedPassword,CAST.MODE_OPENPGP)
@@ -52,12 +68,17 @@ def generateKeys():
     msg=cipher.encrypt(plain)
     print(msg)
 
-
-
     #Dodavanje u prsten
+
+    if  not privateRing.get(email):
+        privateRing[email] = {}
+
+    (privateRing[email])[keys[0]["n"] % (2**64)] = PrivateRingStruct(keys[0], msg, algo, hp)
+
+    print(privateRing[email], str((privateRing[email])[keys[0]["n"] % (2**64)]))
+
 
 if __name__ == '__main__':
     print('ZP Projekat v1.1')
     poruka = "Iva hrvat"
-    generateKeys()
-
+    generateKeys() #dodati elgamal-dsa, publicRing
