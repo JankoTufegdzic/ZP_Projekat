@@ -174,9 +174,9 @@ def encryptMsg(msg, alg):
                 break
             except ValueError:
                 pass
-        cipher = DES3.new(kS, DES3.MODE_OPENPGP)
-
-        eMsg = cipher.encrypt(ba)
+        cipher = DES3.new(kS, DES3.MODE_CBC)
+        iv = cipher.iv
+        eMsg = cipher.encrypt(pad(ba, DES3.block_size))
 
     elif alg == "AES":
             kS = get_random_bytes(16)
@@ -192,8 +192,8 @@ def decryptMsg(eMsg, alg, kS):
     global iv
     msg = None
     if alg == "3DES":
-        cipher = DES3.new(kS, DES3.MODE_OPENPGP)
-        msg = cipher.decrypt(eMsg)
+        cipher = DES3.new(kS, DES3.MODE_CBC, iv=iv)
+        msg = unpad(cipher.decrypt(eMsg), DES3.block_size)
     elif alg == "AES":
         cipher = AES.new(kS, AES.MODE_CBC, iv=iv)
         msg = unpad(cipher.decrypt(eMsg), AES.block_size)
@@ -301,7 +301,7 @@ if __name__ == '__main__':
     pr = list(privateRing[email].items())[0][0]
     pu = list(publicRing.items())[1][0]
     # print(pr, pu)
-    sendMessage(email, password, "radi molim te", "test", pr, pu, "AES")
+    sendMessage(email, password, "radi molim te", "test", pr, pu, "3DES")
     email = input("Uneti email: ")
     password = input("Uneti sifru: ")
     receiveMessage(email, password, "test")
