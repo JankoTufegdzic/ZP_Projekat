@@ -7,6 +7,7 @@ from cryptography.hazmat.primitives import hashes
 from Crypto.Cipher import CAST, DES3, AES
 from Crypto.Hash import SHA1
 from Crypto.Random import get_random_bytes
+from Crypto.Util.Padding import unpad
 import rsa
 
 import base64
@@ -143,14 +144,26 @@ def msgAuth(msg, privateKey):
     # digest.update(ba)
     # hashMsg = digest.finalize()
 
-    digest = SHA1.new()  # hashes.Hash(hashes.SHA1())
-    ba = bytearray(str(msg).encode('utf-8'))
-    digest.update(ba)
-    hashMsg = (digest.digest())
+    # digest = SHA1.new()  # hashes.Hash(hashes.SHA1())
+    # ba = bytearray(str(msg).encode('utf-8'))
+    # digest.update(ba)
+    # hashMsg = (digest.digest())
 
-    return rsa.encrypt(hashMsg, privateKey)
+    return rsa.sign(str(msg).encode('utf-8'), privateKey, 'SHA-1')
+
+def checkAuth(msg, signature, publicKey):
+    # digest = SHA1.new()
+    # ba = bytearray(str(msg).encode('utf-8'))
+    # digest.update(ba)
+    # hashMsg = (digest.digest())
+
+    return rsa.verify(str(msg).encode('utf-8'), signature, publicKey)
+
+
+iv = None
 
 def encryptMsg(msg, alg):
+    global iv
     kS = None
     eMsg = None
     ba = bytearray(str(msg).encode('utf-8'))
@@ -167,21 +180,23 @@ def encryptMsg(msg, alg):
 
     elif alg == "AES":
             kS = get_random_bytes(16)
-            cipher = AES.new(kS, AES.MODE_OPENPGP)
-            eMsg = cipher.encrypt(ba)
+            cipher = AES.new(kS, AES.MODE_CBC)
+            eMsg = cipher.encrypt(pad(ba, AES.block_size))
+            iv = cipher.iv
+            print(iv)
 
     return kS, eMsg
 
 
 def decryptMsg(eMsg, alg, kS):
-    global nonce
+    global iv
     msg = None
     if alg == "3DES":
         cipher = DES3.new(kS, DES3.MODE_OPENPGP)
         msg = cipher.decrypt(eMsg)
     elif alg == "AES":
-        cipher = AES.new(kS, AES.MODE_OPENPGP)
-        msg = cipher.decrypt(eMsg)
+        cipher = AES.new(kS, AES.MODE_CBC, iv=iv)
+        msg = unpad(cipher.decrypt(eMsg), AES.block_size)
 
     return msg
 
@@ -205,18 +220,22 @@ def sendMessage(email, password, msg, name, publicKeyAuthID=None, publicKeyEncrI
             return "error"
         authAlg = tmp.alg
 
-
-        toSend["digest"] = msgAuth(toSend, privateKeyAuth)
-        toSend["octets"] = None
-        toSend["authKeyID"] = publicKeyAuthID
-        toSend["tsAuth"] = datetime.datetime.now()
-        toSend["algAuth"] = authAlg
+        authMsg = {}
+        authMsg["data"] = toSend
+        authMsg["digest"] = msgAuth(toSend, privateKeyAuth)
+        authMsg["octets"] = None
+        authMsg["authKeyID"] = publicKeyAuthID
+        authMsg["tsAuth"] = datetime.datetime.now()
+        authMsg["algAuth"] = authAlg
+        toSend = authMsg
 
     #zip
 
     if publicKeyEncrID is not None:
         encrMsg = {}
+        print(bytearray(str(toSend).encode("utf-8")))
         kS, encrMsg["data"] = encryptMsg(toSend, encrAlg)
+        # print(kS)
         encrMsg["encrKeyID"] = publicKeyEncrID
         publicKeyEncr = publicRing[publicKeyEncrID].pu
         encrMsg["ks"] = encryptKs(kS, publicKeyEncr)
@@ -247,12 +266,29 @@ def receiveMessage(email, password, name):
             return "error"
 
         kS = decryptKs(kS, privateKey)
+        # print(kS)
         toRecv = decryptMsg(data, alg, kS)
-        print(ast.literal_eval(toRecv.decode("utf-8")))
+        # print('\n')
+        # print(toRecv)
+        # print(toRecv.decode("utf-8"))
 
+        toRecv = eval(toRecv.decode("utf-8"))
 
+    if "digest" in toRecv:
+        digest = toRecv["digest"]
+        octets = toRecv["octets"]
+        authKeyID = toRecv["authKeyID"]
+        ts = toRecv["tsAuth"]
+        algAuth = toRecv["algAuth"]
+        toRecv = toRecv["data"]
 
+        publicKey = publicRing[authKeyID].pu
+        print(publicKey)
 
+        if not checkAuth(toRecv, digest, publicKey):
+            return "error"
+
+    print(toRecv)
 
 
 if __name__ == '__main__':
