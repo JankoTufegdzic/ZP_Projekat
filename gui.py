@@ -1,14 +1,24 @@
 import tkinter as tk
 from tkinter import ttk,messagebox,filedialog
 
+from receiveMessagePage import receiveMessageFrame
+from sendMessagePage import sendMessageFrame
+from viewRingsPage import viewRingsFrame
+
 email = None
 password = None
 
 
+
 def goToSimulation():
-    notebook.add(main_tab, text="Simulation")
-    notebook.hide(login_tab)
+
     notebook.select(main_tab)
+    notebook.add(viewRings)
+    notebook.add(receiveMessage)
+    notebook.add(sendMessage)
+
+    notebook.hide(login_tab)
+
 
 
 def onLogin():
@@ -24,6 +34,9 @@ def onLogin():
 def backToLogin():
     notebook.add(login_tab, text="Login")
     notebook.hide(main_tab)
+    notebook.hide(receiveMessage)
+    notebook.hide(sendMessage)
+    notebook.hide(viewRings)
     notebook.select(login_tab)
 
 
@@ -38,6 +51,30 @@ notebook = ttk.Notebook(window)
 login_tab = tk.Frame(notebook)
 notebook.add(login_tab, text="Login")
 
+sendMessage = sendMessageFrame()
+receiveMessage = receiveMessageFrame()
+viewRings = viewRingsFrame()
+main_tab = tk.Frame(notebook)
+
+notebook.add(main_tab, text="Keys")
+notebook.add(sendMessage, text="Send Message")
+notebook.add(receiveMessage, text="Receive Message")
+notebook.add(viewRings, text="View Rings")
+
+notebook.hide(main_tab)
+notebook.hide(sendMessage)
+notebook.hide(receiveMessage)
+notebook.hide(viewRings)
+
+
+back_button = tk.Button(receiveMessage, text="Log out", command=backToLogin)
+back_button.grid(row=0, column=0, sticky="nw", padx=10, pady=10)
+
+back_button = tk.Button(sendMessage, text="Log out", command=backToLogin)
+back_button.grid(row=0, column=0, sticky="nw", padx=10, pady=10)
+
+back_button = tk.Button(viewRings, text="Log out", command=backToLogin)
+back_button.grid(row=0, column=0, sticky="nw", padx=10, pady=10)
 
 # LOGIN PAGE
 
@@ -75,7 +112,7 @@ login_tab.columnconfigure(1, weight=1)
 # END OF LOGIN PAGE
 
 # MAIN PAGE
-main_tab = tk.Frame(notebook)
+
 
 main_tab.grid_rowconfigure(0, weight=1)
 main_tab.grid_rowconfigure(1, weight=1)
@@ -91,7 +128,7 @@ keyGen = tk.Frame(main_tab)
 
 keyGen.grid(row=0, column=0, sticky="nsew")
 
-back_button = tk.Button(keyGen, text="Back", command=backToLogin)
+back_button = tk.Button(keyGen, text="Log out", command=backToLogin)
 back_button.grid(row=0, column=0, sticky="nw", padx=10, pady=10)
 
 keyImportExport = tk.Frame(main_tab)
