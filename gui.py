@@ -1,5 +1,5 @@
 import tkinter as tk
-from tkinter import ttk,messagebox
+from tkinter import ttk,messagebox,filedialog
 
 email = None
 password = None
@@ -126,7 +126,7 @@ keyGenLabel.grid(row=1, column=0, sticky="nw", padx=10, pady=10)
 keyGenLabel = tk.Label(keyGen, text="Select algorithm")
 keyGenLabel.grid(row=2, column=0, sticky="nw", padx=10, pady=10)
 
-lengths = [1024, 2048]
+lengths = ["1024", "2048"]
 algorithms = ["RSA", "DSA+ElGamal"]
 
 keyLength_var = tk.StringVar(value="1024")
@@ -166,7 +166,160 @@ username_var.trace("w",validate_inputs)
 email_var.trace("w",validate_inputs)
 
 password_var.trace("w",validate_password)
+
+
 # END OF KEY GENERATING
+
+#KEY IMPORT/EXPORT
+
+def importPrivateKey():
+    file_path = filedialog.askopenfilename()
+    if file_path:
+        print("Selected file:", file_path)
+        top = tk.Toplevel()
+        top.geometry("200x100")
+        top.title('Enter password')
+
+        entry_label = tk.Label(top, text='Enter password for private key ')
+        entry_label.pack()
+
+        entry_var = tk.StringVar()
+        entry = tk.Entry(top, textvariable=entry_var,show="*")
+        entry.pack()
+
+        ok_button = tk.Button(top, text='OK', command=lambda: privateAddToRing(entry_var.get(), top))
+        ok_button.pack(pady=10,fill="x",padx=20)
+
+def privateAddToRing(input_text, top):
+    top.destroy()
+    #OVDE SE DODAJE U PRSTEN I SIFRUJE!
+    messagebox.showinfo('Result', f'Entered text: {input_text}')
+
+def importPublicKey():
+    file_path = filedialog.askopenfilename()
+    if file_path:
+        print("Selected file:", file_path)
+        messagebox.showinfo('Result', "Import successful")
+        #ovde obrada
+
+
+def enablePrivate(*args):
+    if privateKey_var.get():
+        exportPrivateKeyButton.config(state=tk.NORMAL)
+    else:
+        exportPrivateKeyButton.config(state=tk.DISABLED)
+def enablePublic(*args):
+    if publicKey_var.get():
+        exportPublicKeyButton.config(state=tk.NORMAL)
+    else:
+        exportPublicKeyButton.config(state=tk.DISABLED)
+
+def exportPublic():
+    file_path = filedialog.asksaveasfilename(defaultextension=".pem")
+    if file_path:
+        # Perform the export logic here
+        print("Exporting to:", file_path)
+
+def exportPrivate():
+    top = tk.Toplevel()
+    top.geometry("200x100")
+    top.title('Enter password')
+
+    entry_label = tk.Label(top, text='Enter password for private key ')
+    entry_label.pack()
+
+    entry_var = tk.StringVar()
+    entry = tk.Entry(top, textvariable=entry_var, show="*")
+    entry.pack()
+
+    ok_button = tk.Button(top, text='OK', command=lambda: checkPassword(entry_var.get(), top))
+    ok_button.pack(pady=10, fill="x", padx=20)
+
+def checkPassword(input_text, top):
+    top.destroy()
+    if input_text!="sifra":
+        messagebox.showinfo('Result', "Netacna lozinka!")
+    else:
+        file_path = filedialog.asksaveasfilename(defaultextension=".pem")
+        if file_path:
+            # Perform the export logic here
+            print("Exporting to:", file_path)
+
+
+importExportlabel= tk.Label(keyImportExport, text="Import/Export keys", font=("Arial", 16))
+importExportlabel.grid(row=0, column=1, sticky="nw", padx=10, pady=10)
+
+
+publicKeys=["janko","iva","patronaza","vrtlar"] #OVO CEMO DA UCITAVAMO DINAMICKI
+privateKeys=["mutavi","hrvoje","cigan","nostalgija"]
+
+#DELETING PAIR (in import/export)
+def enableDelete(*args):
+    if deletePair_var.get()=="Choose id":
+        deleteButton.config(state=tk.DISABLED)
+    else:
+        deleteButton.config(state=tk.NORMAL
+                            )
+def deletePair(key):
+    print(f"Deleted {key}")
+
+
+deletePairLabel= tk.Label(keyImportExport, text="Delete pair", font=("Arial", 16))
+deletePairLabel.grid(row=0, column=5, sticky="nw", padx=10, pady=10)
+
+choosePairLabel= tk.Label(keyImportExport, text="Choose pair", font=("Arial", 12))
+choosePairLabel.grid(row=1, column=5, sticky="nw", padx=10, pady=10)
+
+deletePair_var=tk.StringVar(value="Choose id")
+deletePairList=ttk.Combobox(keyImportExport,values=publicKeys,textvariable=deletePair_var,state="readonly")
+deletePairList.grid(row=2, column=5, sticky="nw", padx=10, pady=10)
+
+deleteButton=tk.Button(keyImportExport,text="Delete pair",state=tk.DISABLED,command=lambda: deletePair(deletePair_var.get()))
+deleteButton.grid(row=3, column=5, sticky="nw", padx=10, pady=10)
+
+deletePair_var.trace("w",enableDelete)
+
+#END DELETING PAIR (in import/export)
+
+separator=ttk.Separator(keyImportExport,orient="vertical")
+separator.grid(row=0, column=4, sticky='ns', padx=5)
+
+
+importKeysLabel=tk.Label(keyImportExport, text="Import keys", font=("Arial", 12))
+exportKeysLabel=tk.Label(keyImportExport, text="Export keys", font=("Arial", 12))
+importKeysLabel.grid(row=2, column=0, sticky="nw", padx=10, pady=10)
+exportKeysLabel.grid(row=3, column=0, sticky="nw", padx=10, pady=10)
+
+
+publicImportExportlabel= tk.Label(keyImportExport, text="Public keys", font=("Arial", 12))
+publicImportExportlabel.grid(row=1, column=1, sticky="nw", padx=10, pady=10)
+
+privateImportExportlabel= tk.Label(keyImportExport, text="Private keys", font=("Arial", 12))
+privateImportExportlabel.grid(row=1, column=3, sticky="nw", padx=10, pady=10)
+
+importPublicKeyButton=tk.Button(keyImportExport,text="Import",command=importPublicKey)
+importPublicKeyButton.grid(row=2, column=1, sticky="nw", padx=30, pady=10)
+
+importPrivateKeyButton=tk.Button(keyImportExport,text="Import",command=importPrivateKey)
+importPrivateKeyButton.grid(row=2, column=3, sticky="nw", padx=30, pady=10)
+
+publicKey_var=tk.StringVar()
+publicKeysList=ttk.Combobox(keyImportExport,values=publicKeys,textvariable=publicKey_var,state="readonly")
+publicKeysList.grid(row=3, column=1, sticky="nw", padx=30, pady=10)
+
+privateKey_var=tk.StringVar()
+privateKeysList=ttk.Combobox(keyImportExport,values=privateKeys,textvariable=privateKey_var,state="readonly")
+privateKeysList.grid(row=3, column=3, sticky="nw", padx=30, pady=10)
+
+exportPublicKeyButton=tk.Button(keyImportExport,text="Export",state=tk.DISABLED,command=exportPublic)
+exportPublicKeyButton.grid(row=4, column=1, sticky="nw", padx=30, pady=10)
+
+exportPrivateKeyButton=tk.Button(keyImportExport,text="Export",state=tk.DISABLED,command=exportPrivate)
+exportPrivateKeyButton.grid(row=4, column=3, sticky="nw", padx=30, pady=10)
+
+privateKey_var.trace("w",enablePrivate)
+publicKey_var.trace("w",enablePublic)
+#END OF KEY IMPORT/EXPORT
 
 # END OF MAIN PAGE
 
