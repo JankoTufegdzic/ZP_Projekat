@@ -171,7 +171,7 @@ keyGenLabel = tk.Label(keyGen, text="Select algorithm")
 keyGenLabel.grid(row=2, column=0, sticky="nw", padx=10, pady=10)
 
 lengths = ["1024", "2048"]
-algorithms = ["RSA", "DSA+ElGamal"]
+algorithms = ["RSA", "DSA","ElGamal"]
 
 keyLength_var = tk.StringVar(value="1024")
 keyLength = ttk.Combobox(keyGen, values=lengths, textvariable=keyLength_var, state='readonly')
