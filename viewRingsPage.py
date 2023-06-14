@@ -1,10 +1,10 @@
 import tkinter as tk
 from tkinter import ttk
 
-lista=["janko","ciganija","bratunga"]
 
 
-def viewRingsFrame():
+
+def viewRingsFrame(publicRing:dict,privateRing:dict,email):
 
     viewRings=tk.Frame()
 
@@ -14,31 +14,34 @@ def viewRingsFrame():
     privateRingLabel = tk.Label(viewRings, text="Private ring", font=("Arial", 12))
     privateRingLabel.pack(anchor="nw", padx=10, pady=10)
 
-    privateRing = tk.Text(viewRings, height=10,width=80)
-    privateRing.config(bg="green")
-    privateRing.pack(anchor="nw", padx=10, pady=10)
+    privateRingTable = tk.Text(viewRings, height=10,width=80)
+    privateRingTable.config(bg="green")
+    privateRingTable.pack(anchor="nw", padx=10, pady=10)
 
-    for i in range(len(lista)):
-        privateRing.insert(f"{i}.0",f"{lista[i]}\n")
+    myPrivate=privateRing.get(email)
+    if myPrivate is None:
+        myPrivate={}
+    i=0
+    for j in myPrivate.keys():
+        privateRingTable.insert(f"{i}.0",f"{myPrivate[j].pu}\n") #samo javni kljuc pise
+        i+=1
 
-    #bitno da se stavi ovo da ne bi moglo da se menja, pri promeni promenimo na normal, upisemo, i onda disablujemo opet
-    privateRing.config(state="disabled")
+    privateRingTable.config(state="disabled")
 
     publicRingLabel = tk.Label(viewRings, text="Public ring", font=("Arial", 12))
     publicRingLabel.pack(anchor="nw", padx=10, pady=10)
 
-    publicRing = tk.Text(viewRings, height=10, width=80)
-    publicRing.config(bg="lightblue")
-    publicRing.pack(anchor="nw", padx=10, pady=10)
+    publicRingTable = tk.Text(viewRings, height=10, width=80)
+    publicRingTable.config(bg="lightblue")
+    publicRingTable.pack(anchor="nw", padx=10, pady=10)
 
-    for i in range(30):
-        publicRing.insert(f"{i}.0", "iva\n")
+    i=0
+    for j in publicRing.keys():
+        publicRingTable.insert(f"{i}.0", f"{publicRing[j].pu}\n")#samo javni kljuc pise
+        i += 1
 
-        # bitno da se stavi ovo da ne bi moglo da se menja, pri promeni promenimo na normal, upisemo, i onda disablujemo opet
-    publicRing.config(state="disabled")
+    publicRingTable.config(state="disabled")
 
-    # button=tk.Button(viewRings,text="pls",command=dodaj)
-    # button.pack()
     return viewRings
 
 

@@ -12,12 +12,12 @@ password = None
 
 
 def goToSimulation():
-    global viewRings,sendMessage,receiveMessage
+    global viewRings,sendMessage,receiveMessage,email
     notebook.forget(login_tab)
 
-    viewRings=viewRingsFrame()
-    sendMessage=sendMessageFrame()
-    receiveMessage=receiveMessageFrame()
+    viewRings=viewRingsFrame(publicRing,privateRing,email)
+    sendMessage=sendMessageFrame(publicRing,privateRing)
+    receiveMessage=receiveMessageFrame(publicRing,privateRing)
 
     notebook.add(main_tab, text="Keys")
     notebook.add(sendMessage, text="Send Message")
@@ -64,9 +64,9 @@ notebook = ttk.Notebook(window)
 login_tab = tk.Frame(notebook)
 notebook.add(login_tab, text="Login")
 
-sendMessage = sendMessageFrame()
-receiveMessage = receiveMessageFrame()
-viewRings = viewRingsFrame()
+sendMessage = sendMessageFrame(publicRing,privateRing)
+receiveMessage = receiveMessageFrame(publicRing,privateRing)
+viewRings = viewRingsFrame(publicRing,privateRing,email)
 main_tab = tk.Frame(notebook)
 
 notebook.add(main_tab, text="Keys")
@@ -78,9 +78,6 @@ notebook.hide(main_tab)
 notebook.hide(sendMessage)
 notebook.hide(receiveMessage)
 notebook.hide(viewRings)
-
-
-
 
 
 
@@ -162,13 +159,25 @@ def validate_password(*args):
 
 
 def generate():
-    size = int(keyLength_var.get())
-    algo = algo_var.get()
-    name = username_entry.get()
-    email = email_var.get()
-    password = password_var.get()
-    generateKeys(name, email, algo, size, password)
-    print(privateRing["email"])  ##
+
+    generateKeys(username_entry.get(), email_var.get(), algo_var.get(),  int(keyLength_var.get()), password_var.get())
+    #print(privateRing["email"])
+
+    #update pages
+    global sendMessage,viewRings,receiveMessage,email
+    notebook.forget(sendMessage)
+    notebook.forget(viewRings)
+    notebook.forget(receiveMessage)
+
+    viewRings = viewRingsFrame(publicRing, privateRing,email)
+    sendMessage = sendMessageFrame(publicRing, privateRing)
+    receiveMessage = receiveMessageFrame(publicRing, privateRing)
+
+    notebook.add(sendMessage, text="Send Message")
+    notebook.add(receiveMessage, text="Receive Message")
+    notebook.add(viewRings, text="View Rings")
+
+    #
     messagebox.showinfo('Prompt', 'Keys are generated.')
 
 

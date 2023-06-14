@@ -3,7 +3,7 @@ from tkinter import ttk , messagebox,filedialog
 
 
 
-def sendMessageFrame():
+def sendMessageFrame(publicRing,privateRing):
     def toggle_encryption_visibility():
         if encr_var.get() == 1:
             publicLabel.config(state="normal")
