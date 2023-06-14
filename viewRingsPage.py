@@ -1,7 +1,11 @@
 import tkinter as tk
 from tkinter import ttk
 
+lista=["janko","ciganija","bratunga"]
+
+
 def viewRingsFrame():
+
     viewRings=tk.Frame()
 
     viewRingsLabel=tk.Label(viewRings,text="View rings",font=("Arial",16))
@@ -14,8 +18,8 @@ def viewRingsFrame():
     privateRing.config(bg="green")
     privateRing.pack(anchor="nw", padx=10, pady=10)
 
-    for i in range(30):
-        privateRing.insert(f"{i}.0","janko\n")
+    for i in range(len(lista)):
+        privateRing.insert(f"{i}.0",f"{lista[i]}\n")
 
     #bitno da se stavi ovo da ne bi moglo da se menja, pri promeni promenimo na normal, upisemo, i onda disablujemo opet
     privateRing.config(state="disabled")
@@ -33,6 +37,8 @@ def viewRingsFrame():
         # bitno da se stavi ovo da ne bi moglo da se menja, pri promeni promenimo na normal, upisemo, i onda disablujemo opet
     publicRing.config(state="disabled")
 
+    # button=tk.Button(viewRings,text="pls",command=dodaj)
+    # button.pack()
     return viewRings
 
 
