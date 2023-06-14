@@ -10,12 +10,15 @@ def sendMessageFrame():
             encrKeyId_list.config(state="normal")
             algoLabel.config(state="normal")
             algo_list.config(state="normal")
-
+            userLabel.config(state="normal")
+            toUser_list.config(state="normal")
         else:
             encrKeyId_list.config(state="disabled")
             publicLabel.config(state="disabled")
             algoLabel.config(state="disabled")
             algo_list.config(state="disabled")
+            userLabel.config(state="disabled")
+            toUser_list.config(state="disabled")
 
     def toggle_authentication_visibility():
         if auth_var.get() == 1:
@@ -101,25 +104,36 @@ def sendMessageFrame():
     encrCheckbox = tk.Checkbutton(sendMessage, text="Select", variable=encr_var, command=toggle_encryption_visibility)
     encrCheckbox.grid(row=2, column=1, sticky="nw", padx=10, pady=10)
 
-    publicLabel = tk.Label(sendMessage, text="Public key ID:", font=("Arial", 10),state="disabled")
-    publicLabel.grid(row=2, column=2, sticky="nw", padx=10, pady=10)
 
+    users=["pera","mika","laza"]
+
+    userLabel = tk.Label(sendMessage, text="User:", font=("Arial", 10), state="disabled")
+    userLabel.grid(row=2, column=2, sticky="nw", padx=10, pady=10)
+
+    toUser_var=tk.StringVar()
+    toUser_var.set(value="Choose user")
+    toUser_list = ttk.OptionMenu(sendMessage, toUser_var, *users)
+    toUser_list.config(state="disabled")
+    toUser_list.grid(row=2, column=3, sticky="nw", padx=10, pady=10)
+
+    publicLabel = tk.Label(sendMessage, text="Public key ID:", font=("Arial", 10), state="disabled")
+    publicLabel.grid(row=3, column=2, sticky="nw", padx=10, pady=10)
 
     encrKeyId_var = tk.StringVar()
     encrKeyId_var.set(value="Choose id")
     encrKeyId_list = ttk.OptionMenu(sendMessage, encrKeyId_var,*publicKeys)
     encrKeyId_list.config(state="disabled")
-    encrKeyId_list.grid(row=2, column=3, sticky="nw", padx=10, pady=10)
+    encrKeyId_list.grid(row=3, column=3, sticky="nw", padx=10, pady=10)
 
 
     algoLabel=tk.Label(sendMessage, text="Algorithm:", font=("Arial", 10),state="disabled")
-    algoLabel.grid(row=3, column=2, sticky="nw", padx=10, pady=10)
+    algoLabel.grid(row=4, column=2, sticky="nw", padx=10, pady=10)
 
     algorithms=["AES","3DES"]
     algo_var = tk.StringVar(value="AES")
     algo_list = ttk.OptionMenu(sendMessage, algo_var,*algorithms)
     algo_list.config(state="disabled")
-    algo_list.grid(row=3, column=3, sticky="nw", padx=10, pady=10)
+    algo_list.grid(row=4, column=3, sticky="nw", padx=10, pady=10)
 
 #ZIP
     zip_var = tk.IntVar()
