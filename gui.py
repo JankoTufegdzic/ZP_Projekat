@@ -11,12 +11,10 @@ password = None
 
 
 def goToSimulation():
-
     notebook.select(main_tab)
     notebook.add(viewRings)
     notebook.add(receiveMessage)
     notebook.add(sendMessage)
-
     notebook.hide(login_tab)
 
 
@@ -65,7 +63,6 @@ notebook.hide(main_tab)
 notebook.hide(sendMessage)
 notebook.hide(receiveMessage)
 notebook.hide(viewRings)
-
 
 back_button = tk.Button(receiveMessage, text="Log out", command=backToLogin)
 back_button.grid(row=0, column=0, sticky="nw", padx=10, pady=10)
