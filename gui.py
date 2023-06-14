@@ -12,11 +12,26 @@ password = None
 
 
 def goToSimulation():
+    global viewRings,sendMessage,receiveMessage
+    notebook.forget(login_tab)
+
+    viewRings=viewRingsFrame()
+    sendMessage=sendMessageFrame()
+    receiveMessage=receiveMessageFrame()
+
+    notebook.add(main_tab, text="Keys")
+    notebook.add(sendMessage, text="Send Message")
+    notebook.add(receiveMessage, text="Receive Message")
+    notebook.add(viewRings, text="View Rings")
+
+    back_button = tk.Button(receiveMessage, text="Log out", command=backToLogin)
+    back_button.grid(row=0, column=0, sticky="nw", padx=10, pady=10)
+
+    back_button = tk.Button(sendMessage, text="Log out", command=backToLogin)
+    back_button.grid(row=0, column=0, sticky="nw", padx=10, pady=10)
+
     notebook.select(main_tab)
-    notebook.add(viewRings)
-    notebook.add(receiveMessage)
-    notebook.add(sendMessage)
-    notebook.hide(login_tab)
+
 
 
 def onLogin():
@@ -31,10 +46,10 @@ def onLogin():
 
 def backToLogin():
     notebook.add(login_tab, text="Login")
-    notebook.hide(main_tab)
-    notebook.hide(receiveMessage)
-    notebook.hide(sendMessage)
-    notebook.hide(viewRings)
+    notebook.forget(main_tab)
+    notebook.forget(receiveMessage)
+    notebook.forget(sendMessage)
+    notebook.forget(viewRings)
     notebook.select(login_tab)
 
 
@@ -64,14 +79,9 @@ notebook.hide(sendMessage)
 notebook.hide(receiveMessage)
 notebook.hide(viewRings)
 
-back_button = tk.Button(receiveMessage, text="Log out", command=backToLogin)
-back_button.grid(row=0, column=0, sticky="nw", padx=10, pady=10)
 
-back_button = tk.Button(sendMessage, text="Log out", command=backToLogin)
-back_button.grid(row=0, column=0, sticky="nw", padx=10, pady=10)
 
-back_button = tk.Button(viewRings, text="Log out", command=backToLogin)
-back_button.grid(row=0, column=0, sticky="nw", padx=10, pady=10)
+
 
 
 # LOGIN PAGE
