@@ -65,13 +65,10 @@ def addToRings(email, password, privateKey, publicKey, pubID, algo):
     publicRing[int(pubID) % (2 ** 64)] = PublicRingStruct(publicKey, algo, email)
 
 
-def generateKeys():
-    name = input("Unesite ime")
-    email = input("Unesite email")
-    algo = input("Unesite algoritam ")
-    size = 1024  # int(input("Unesite velicini"))
+def generateKeys(name,email,algo,size,password):
+
     keys = None
-    password = input("Unesite lozinku")
+
     if algo == "RSA":
         keys = generateKeysRSA(size)
         publicKey = keys[0]

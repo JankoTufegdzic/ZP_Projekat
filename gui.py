@@ -5,6 +5,8 @@ from receiveMessagePage import receiveMessageFrame
 from sendMessagePage import sendMessageFrame
 from viewRingsPage import viewRingsFrame
 
+from main import generateKeys, privateRing,publicRing
+
 email = None
 password = None
 
@@ -149,7 +151,15 @@ def validate_password(*args):
         generate_button.config(state=tk.DISABLED)
 
 def generate():
-    messagebox.showinfo('Prompt', 'This is the prompt text.')
+
+    size=int(keyLength_var.get())
+    algo=algo_var.get()
+    name=username_entry.get()
+    email=email_var.get()
+    password=password_var.get()
+    generateKeys(name,email,algo,size,password)
+    print(privateRing["email"])
+    messagebox.showinfo('Prompt', 'Keys are generated.')
 
 keyGenLabel = tk.Label(keyGen, text="Generate keys", font=("Arial", 16))
 keyGenLabel.grid(row=0, column=1, sticky="nw", padx=10, pady=10)
@@ -284,7 +294,7 @@ importExportlabel= tk.Label(keyImportExport, text="Import/Export keys", font=("A
 importExportlabel.grid(row=0, column=1, sticky="nw", padx=10, pady=10)
 
 
-publicKeys=["janko","iva","patronaza","vrtlar"] #OVO CEMO DA UCITAVAMO DINAMICKI
+publicKeys=[] #OVO CEMO DA UCITAVAMO DINAMICKI
 privateKeys=["mutavi","hrvoje","cigan","nostalgija"]
 
 #DELETING PAIR (in import/export)
