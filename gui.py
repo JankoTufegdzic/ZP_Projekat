@@ -11,27 +11,29 @@ email = None
 password = None
 
 
-def goToSimulation():
-    global viewRings,sendMessage,receiveMessage,email
-    notebook.forget(login_tab)
+def refreshPages():
+    global viewRings, sendMessage, receiveMessage, email
 
-    viewRings=viewRingsFrame(publicRing,privateRing,email)
-    sendMessage=sendMessageFrame(publicRing,privateRing)
-    receiveMessage=receiveMessageFrame(publicRing,privateRing)
+    viewRings = viewRingsFrame(publicRing, privateRing, email)
+    sendMessage = sendMessageFrame(publicRing, privateRing)
+    receiveMessage = receiveMessageFrame(publicRing, privateRing)
 
     notebook.add(main_tab, text="Keys")
     notebook.add(sendMessage, text="Send Message")
     notebook.add(receiveMessage, text="Receive Message")
     notebook.add(viewRings, text="View Rings")
 
-    back_button = tk.Button(receiveMessage, text="Log out", command=backToLogin)
-    back_button.grid(row=0, column=0, sticky="nw", padx=10, pady=10)
+    backButton = tk.Button(receiveMessage, text="Log out", command=backToLogin)
+    backButton.grid(row=0, column=0, sticky="nw", padx=10, pady=10)
 
-    back_button = tk.Button(sendMessage, text="Log out", command=backToLogin)
-    back_button.grid(row=0, column=0, sticky="nw", padx=10, pady=10)
+    backButton = tk.Button(sendMessage, text="Log out", command=backToLogin)
+    backButton.grid(row=0, column=0, sticky="nw", padx=10, pady=10)
 
+
+def goToSimulation():
+    notebook.forget(login_tab)
+    refreshPages()
     notebook.select(main_tab)
-
 
 
 def onLogin():
@@ -53,7 +55,6 @@ def backToLogin():
     notebook.select(login_tab)
 
 
-# Create the main window
 window = tk.Tk()
 window.title("PGP simulator")
 window.geometry("800x600")
@@ -64,9 +65,9 @@ notebook = ttk.Notebook(window)
 login_tab = tk.Frame(notebook)
 notebook.add(login_tab, text="Login")
 
-sendMessage = sendMessageFrame(publicRing,privateRing)
-receiveMessage = receiveMessageFrame(publicRing,privateRing)
-viewRings = viewRingsFrame(publicRing,privateRing,email)
+sendMessage = sendMessageFrame(publicRing, privateRing)
+receiveMessage = receiveMessageFrame(publicRing, privateRing)
+viewRings = viewRingsFrame(publicRing, privateRing, email)
 main_tab = tk.Frame(notebook)
 
 notebook.add(main_tab, text="Keys")
@@ -78,7 +79,6 @@ notebook.hide(main_tab)
 notebook.hide(sendMessage)
 notebook.hide(receiveMessage)
 notebook.hide(viewRings)
-
 
 
 # LOGIN PAGE
@@ -159,23 +159,18 @@ def validate_password(*args):
 
 
 def generate():
+    generateKeys(username_entry.get(), email_var.get(), algo_var.get(), int(keyLength_var.get()), password_var.get())
 
-    generateKeys(username_entry.get(), email_var.get(), algo_var.get(),  int(keyLength_var.get()), password_var.get())
-    #print(privateRing["email"])
+    deletePairList.set('')
+    deletePairList['values'] = list(publicRing.keys())
 
-    #update pages
-    global sendMessage,viewRings,receiveMessage,email
+    # update pages
+    global sendMessage, viewRings, receiveMessage, email
     notebook.forget(sendMessage)
     notebook.forget(viewRings)
     notebook.forget(receiveMessage)
 
-    viewRings = viewRingsFrame(publicRing, privateRing,email)
-    sendMessage = sendMessageFrame(publicRing, privateRing)
-    receiveMessage = receiveMessageFrame(publicRing, privateRing)
-
-    notebook.add(sendMessage, text="Send Message")
-    notebook.add(receiveMessage, text="Receive Message")
-    notebook.add(viewRings, text="View Rings")
+    refreshPages()
 
     #
     messagebox.showinfo('Prompt', 'Keys are generated.')
@@ -255,17 +250,41 @@ def importPrivateKey():
 
 
 def privateAddToRing(input_text, top):
+    global privateRing, email
     top.destroy()
-    # OVDE SE DODAJE U PRSTEN I SIFRUJE!
+    # TODO: OVDE SE DODAJE U PRSTEN I SIFRUJE!
+
+    #ovo je samo proba za osvezavanje
+    if "dsa" not in privateRing.keys():
+        privateRing["dsa"]={}
+
+    privateRing["dsa"][0]="janko"
+    #
+
+    notebook.forget(sendMessage)
+    notebook.forget(viewRings)
+    notebook.forget(receiveMessage)
+    refreshPages()
+
     messagebox.showinfo('Result', f'Entered text: {input_text}')
 
 
 def importPublicKey():
+    global publicRing, sendMessage, viewRings, receiveMessage, email
     file_path = filedialog.askopenfilename()
     if file_path:
         print("Selected file:", file_path)
+
+        # TODO:Ovde dodamo u ring
+        publicRing["janko"] = "janko"
+
+        # Ovde dodamo u ring
+
+        notebook.forget(sendMessage)
+        notebook.forget(viewRings)
+        notebook.forget(receiveMessage)
+        refreshPages()
         messagebox.showinfo('Result', "Import successful")
-        # ovde obrada
 
 
 def enablePrivate(*args):

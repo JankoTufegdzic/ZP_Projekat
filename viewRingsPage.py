@@ -23,7 +23,7 @@ def viewRingsFrame(publicRing:dict,privateRing:dict,email):
         myPrivate={}
     i=0
     for j in myPrivate.keys():
-        privateRingTable.insert(f"{i}.0",f"{myPrivate[j].pu}\n") #samo javni kljuc pise
+        privateRingTable.insert(f"{i}.0",f"{myPrivate[j]}\n") #samo javni kljuc pise
         i+=1
 
     privateRingTable.config(state="disabled")
@@ -37,7 +37,7 @@ def viewRingsFrame(publicRing:dict,privateRing:dict,email):
 
     i=0
     for j in publicRing.keys():
-        publicRingTable.insert(f"{i}.0", f"{publicRing[j].pu}\n")#samo javni kljuc pise
+        publicRingTable.insert(f"{i}.0", f"{publicRing[j]}\n")#samo javni kljuc pise
         i += 1
 
     publicRingTable.config(state="disabled")
