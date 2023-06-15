@@ -29,6 +29,15 @@ def refreshPages():
     backButton = tk.Button(sendMessage, text="Log out", command=backToLogin)
     backButton.grid(row=0, column=0, sticky="nw", padx=10, pady=10)
 
+def updateLists():
+    privateKeysList.set('')
+    privateKeysList['value']=list(privateRing[email].keys())
+
+    publicKeysList.set('')
+    publicKeysList['value'] = list(publicRing.keys())
+
+    deletePairList.set('')
+    deletePairList['value'] = list(publicRing.keys())
 
 def goToSimulation():
     notebook.forget(login_tab)
@@ -161,8 +170,7 @@ def validate_password(*args):
 def generate():
     generateKeys(username_entry.get(), email_var.get(), algo_var.get(), int(keyLength_var.get()), password_var.get())
 
-    deletePairList.set('')
-    deletePairList['values'] = list(publicRing.keys())
+    updateLists()
 
     # update pages
     global sendMessage, viewRings, receiveMessage, email
@@ -255,11 +263,12 @@ def privateAddToRing(input_text, top):
     # TODO: OVDE SE DODAJE U PRSTEN I SIFRUJE!
 
     #ovo je samo proba za osvezavanje
-    if "dsa" not in privateRing.keys():
-        privateRing["dsa"]={}
+    if email not in privateRing.keys():
+        privateRing[email]={}
 
-    privateRing["dsa"][0]="janko"
+    privateRing[email][0]="janko"
     #
+    updateLists()
 
     notebook.forget(sendMessage)
     notebook.forget(viewRings)
@@ -278,7 +287,10 @@ def importPublicKey():
         # TODO:Ovde dodamo u ring
         publicRing["janko"] = "janko"
 
-        # Ovde dodamo u ring
+
+
+        # Update padajuce liste
+        updateLists()
 
         notebook.forget(sendMessage)
         notebook.forget(viewRings)
@@ -338,8 +350,10 @@ def checkPassword(input_text, top):
 importExportlabel = tk.Label(keyImportExport, text="Import/Export keys", font=("Arial", 16))
 importExportlabel.grid(row=0, column=1, sticky="nw", padx=10, pady=10)
 
-publicKeys = []  # OVO CEMO DA UCITAVAMO DINAMICKI
-privateKeys = ["mutavi", "hrvoje", "cigan", "nostalgija"]
+publicKeys = list(publicRing.keys())
+privateKeys =None
+
+
 
 
 # DELETING PAIR (in import/export)
@@ -352,6 +366,8 @@ def enableDelete(*args):
 
 
 def deletePair(key):
+    #TODO: Ovde brisanje
+    updateLists()
     print(f"Deleted {key}")
 
 
