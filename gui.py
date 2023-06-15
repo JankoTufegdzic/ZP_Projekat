@@ -15,7 +15,7 @@ def refreshPages():
     global viewRings, sendMessage, receiveMessage, email
 
     viewRings = viewRingsFrame(publicRing, privateRing, email)
-    sendMessage = sendMessageFrame(publicRing, privateRing)
+    sendMessage = sendMessageFrame(publicRing, privateRing,email)
     receiveMessage = receiveMessageFrame(publicRing, privateRing)
 
     notebook.add(main_tab, text="Keys")
@@ -74,7 +74,7 @@ notebook = ttk.Notebook(window)
 login_tab = tk.Frame(notebook)
 notebook.add(login_tab, text="Login")
 
-sendMessage = sendMessageFrame(publicRing, privateRing)
+sendMessage = sendMessageFrame(publicRing, privateRing,email)
 receiveMessage = receiveMessageFrame(publicRing, privateRing)
 viewRings = viewRingsFrame(publicRing, privateRing, email)
 main_tab = tk.Frame(notebook)
@@ -350,8 +350,8 @@ def checkPassword(input_text, top):
 importExportlabel = tk.Label(keyImportExport, text="Import/Export keys", font=("Arial", 16))
 importExportlabel.grid(row=0, column=1, sticky="nw", padx=10, pady=10)
 
-publicKeys = list(publicRing.keys())
-privateKeys =None
+publicKeys = []
+privateKeys =[]
 
 
 

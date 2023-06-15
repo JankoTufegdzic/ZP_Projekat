@@ -3,7 +3,7 @@ from tkinter import ttk , messagebox,filedialog
 
 
 
-def sendMessageFrame(publicRing,privateRing):
+def sendMessageFrame(publicRing,privateRing,email):
     def toggle_encryption_visibility():
         if encr_var.get() == 1:
             publicLabel.config(state="normal")
@@ -56,6 +56,23 @@ def sendMessageFrame(publicRing,privateRing):
         if file_path:
            #generate message and save file here
             print("Exporting to:", file_path)
+    def getForUser(id):
+        lista=[]
+        for  key in publicRing:
+            if publicRing[key].userID==id:
+                lista.append(key)
+        return lista
+
+    def getUsers():
+        return list(privateRing.keys())
+
+    def getInitialPublic():
+        return getForUser(email)
+    def changeUser(*args):
+        newId=toUser_var.get()
+        publicKeys=getForUser(newId)
+        encrKeyId_list = ttk.OptionMenu(sendMessage, encrKeyId_var, *publicKeys)
+        encrKeyId_list.grid(row=3, column=3, sticky="nw", padx=10, pady=10)
 
     sendMessage = tk.Frame()
 
@@ -63,8 +80,6 @@ def sendMessageFrame(publicRing,privateRing):
     sendMessage.columnconfigure(1, weight=0,minsize=30)
     sendMessage.columnconfigure(2, weight=1,minsize=100)
     sendMessage.columnconfigure(3, weight=1,minsize=150)
-
-
 
     sendMessageLabel = tk.Label(sendMessage, text="Send Message", font=("Arial", 16))
     sendMessageLabel.grid(row=0, column=1, sticky="nw", padx=10, pady=10)
@@ -78,8 +93,13 @@ def sendMessageFrame(publicRing,privateRing):
     base64Label = tk.Label(sendMessage, text="Base64", font=("Arial", 12))
     base64Label.grid(row=4, column=0, sticky="nw", padx=10, pady=10)
 
-    privateKeys = ["prvi", "drugi", "treci", "gas"]  # privremeno
-    publicKeys = ["xxx", "yyy", "zzz", "piletina"]
+    if email in privateRing.keys():
+        privateKeys =list(privateRing[email].keys())
+    else:
+        privateKeys=[]
+
+    users = getUsers()
+    publicKeys =getInitialPublic()
 
 #Authentication
     auth_var = tk.IntVar()
@@ -105,16 +125,15 @@ def sendMessageFrame(publicRing,privateRing):
     encrCheckbox.grid(row=2, column=1, sticky="nw", padx=10, pady=10)
 
 
-    users=["pera","mika","laza"]
-
     userLabel = tk.Label(sendMessage, text="User:", font=("Arial", 10), state="disabled")
     userLabel.grid(row=2, column=2, sticky="nw", padx=10, pady=10)
 
     toUser_var=tk.StringVar()
-    toUser_var.set(value="Choose user")
-    toUser_list = ttk.OptionMenu(sendMessage, toUser_var, *users)
+    toUser_list = ttk.OptionMenu(sendMessage, toUser_var,email, *users)
     toUser_list.config(state="disabled")
     toUser_list.grid(row=2, column=3, sticky="nw", padx=10, pady=10)
+
+    toUser_var.trace("w",changeUser)
 
     publicLabel = tk.Label(sendMessage, text="Public key ID:", font=("Arial", 10), state="disabled")
     publicLabel.grid(row=3, column=2, sticky="nw", padx=10, pady=10)
