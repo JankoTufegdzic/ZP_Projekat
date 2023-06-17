@@ -1,4 +1,4 @@
-from Cryptodome.Cipher import DES3, AES
+from Cryptodome.Cipher import DES3, AES, PKCS1_OAEP
 from Cryptodome.Random import get_random_bytes
 from Cryptodome.Util.Padding import unpad, pad
 import random
@@ -46,13 +46,17 @@ def decryptMsg(eMsg, alg, kS, iv):
 
 def encryptKs(kS, publicKey, alg):
     if alg == "RSA":
-        return rsa.encrypt(kS, publicKey)
+        rsaKey = PKCS1_OAEP.new(publicKey)
+        return rsaKey.encrypt(kS)
+        #return rsa.encrypt(kS, publicKey)
     else:
         return publicKey._encrypt(int.from_bytes(kS, 'big'), int(random.randint(1, publicKey.p - 1)))
 
 
 def decryptKs(kS, privateKey, alg):
     if alg == "RSA":
-        return rsa.decrypt(kS, privateKey)
+        #return rsa.decrypt(kS, privateKey)
+        rsaKey = PKCS1_OAEP.new(privateKey)
+        return rsaKey.decrypt(kS)
     else:
         return privateKey._decrypt(tuple(kS)).to_bytes(24, 'big')
