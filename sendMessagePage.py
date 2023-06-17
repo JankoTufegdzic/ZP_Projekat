@@ -85,15 +85,41 @@ def sendMessageFrame(publicRing,privateRing,email,password):
     def getForUser(id):
         lista=[]
         for  key in publicRing:
-            if publicRing[key].userID==id:
+            algo = options_var.get()
+            if publicRing[key].userID==id and publicRing[key].alg!="DSA" and algo.find(publicRing[key].alg)!=-1:
                 lista.append(key)
+
         return lista
+
+    def updatePrivate():
+        if email in privateRing.keys():
+            privateKeys = []
+            for i in privateRing[email].keys():
+                algo=options_var.get()
+                if privateRing[email][i].alg != "ElGamal" and algo.find(privateRing[email][i].alg)!=-1:
+                    privateKeys.append(i)
+        else:
+            privateKeys = []
+
+        authKeyId_list['value']=privateKeys
+
+    def changeAlgos(*args):
+
+        l=getForUser(toUser_var.get())
+        encrKeyId_list['values']=l #TODO:ispravka
+
+        updatePrivate()
+
 
     def getUsers():
         return list(privateRing.keys())
 
     def getInitialPublic():
         return getForUser(email)
+
+
+
+
     def changeUser(*args):
         newId=toUser_var.get()
         publicKeys=getForUser(newId)
@@ -110,6 +136,18 @@ def sendMessageFrame(publicRing,privateRing,email,password):
     sendMessageFrameLabel = tk.Label(sendMessageFrame, text="Send Message", font=("Arial", 16))
     sendMessageFrameLabel.grid(row=0, column=1, sticky="nw", padx=10, pady=10)
 
+
+    chooseOptLabel=tk.Label(sendMessageFrame,text="Select algorithm",font=("Arial",12))
+    chooseOptLabel.grid(column=2, row=0)
+
+    options=["RSA","DSA+ElGamal"]
+
+    options_var=tk.StringVar(value="RSA")
+    chooseCombOption=ttk.OptionMenu(sendMessageFrame,options_var,"RSA",*options)
+    chooseCombOption.grid(column=3,row=0)
+
+    options_var.trace("w",changeAlgos)
+
     authLabel = tk.Label(sendMessageFrame, text="Authentication", font=("Arial", 12))
     authLabel.grid(row=1, column=0, sticky="nw", padx=10, pady=10)
     encrLabel = tk.Label(sendMessageFrame, text="Encryption", font=("Arial", 12))
@@ -120,7 +158,10 @@ def sendMessageFrame(publicRing,privateRing,email,password):
     base64Label.grid(row=4, column=0, sticky="nw", padx=10, pady=10)
 
     if email in privateRing.keys():
-        privateKeys =list(privateRing[email].keys())
+        privateKeys =[]
+        for i in privateRing[email].keys():
+            if privateRing[email][i].alg != "ElGamal":
+                privateKeys.append(i)
     else:
         privateKeys=[]
 
@@ -165,11 +206,9 @@ def sendMessageFrame(publicRing,privateRing,email,password):
     publicLabel.grid(row=3, column=2, sticky="nw", padx=10, pady=10)
 
     encrKeyId_var = tk.StringVar()
-    encrKeyId_var.set(value="Choose id")
-    encrKeyId_list = ttk.OptionMenu(sendMessageFrame, encrKeyId_var,*publicKeys)
+    encrKeyId_list = ttk.Combobox(sendMessageFrame, textvariable=encrKeyId_var,values=publicKeys)
     encrKeyId_list.config(state="disabled")
     encrKeyId_list.grid(row=3, column=3, sticky="nw", padx=10, pady=10)
-
 
     algoLabel=tk.Label(sendMessageFrame, text="Algorithm:", font=("Arial", 10),state="disabled")
     algoLabel.grid(row=4, column=2, sticky="nw", padx=10, pady=10)
