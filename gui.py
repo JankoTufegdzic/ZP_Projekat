@@ -27,7 +27,7 @@ def refreshPages():
 
     viewRings = viewRingsFrame(publicRing, privateRing, email)
     sendMessage = sendMessageFrame(publicRing, privateRing, email,password)
-    receiveMessage = receiveMessageFrame(publicRing, privateRing, email)
+    receiveMessage = receiveMessageFrame(publicRing, privateRing, email,users)
 
     notebook.add(main_tab, text="Keys")
     notebook.add(sendMessage, text="Send Message")
@@ -102,7 +102,7 @@ login_tab = tk.Frame(notebook)
 notebook.add(login_tab, text="Login")
 
 sendMessage = sendMessageFrame(publicRing, privateRing, email,password)
-receiveMessage = receiveMessageFrame(publicRing, privateRing, email)
+receiveMessage = receiveMessageFrame(publicRing, privateRing, email,users)
 viewRings = viewRingsFrame(publicRing, privateRing, email)
 main_tab = tk.Frame(notebook)
 

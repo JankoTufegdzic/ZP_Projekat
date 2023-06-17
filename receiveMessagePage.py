@@ -2,7 +2,8 @@ import tkinter as tk
 from tkinter import ttk , messagebox,filedialog
 from main import  receiveMessage
 
-def receiveMessageFrame(publicRing,privateRing,email):
+
+def receiveMessageFrame(publicRing,privateRing,email,users):
 
 
     def selectMessage():
@@ -11,7 +12,7 @@ def receiveMessageFrame(publicRing,privateRing,email):
             #TODO: MORA DA UNESE VREDNOST PASSWORDA!!
 
 
-            b64,auth,encr,zip,error,toRecv = receiveMessage(email,'1',file_path)
+            b64,auth,encr,zip,error,toRecv,user = receiveMessage(email,'1',file_path)
 
             if error == "":
                 signatureLabel.config(text="Signature is ok!", foreground="green")
@@ -47,7 +48,15 @@ def receiveMessageFrame(publicRing,privateRing,email):
                 encrLabel.config(foreground="red")
 
 
-            text.insert("1.0", str(toRecv))# text poruke
+            text.insert("1.0", "Timestamp: "+str(toRecv["ts"])+"\n")
+            if auth==1:
+
+                for u in users:
+                    if(u.username==user):
+                        us=u
+
+                text.insert("2.0", "User: "+ f' {us.name} "{us.username}" '+"\n")
+            text.insert("3.0", "Data: "+toRecv["data"]+"\n")
 
     def saveMessage():
         file_path = filedialog.asksaveasfilename(defaultextension=".txt")

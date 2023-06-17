@@ -208,6 +208,7 @@ def receiveMessage(email, password, name):
     auth=False
     encr=False
     error=""
+    user=""
 
     with open(name) as file:
         toRecv = file.read()
@@ -237,7 +238,7 @@ def receiveMessage(email, password, name):
         privateKey = decryptPrivateKey(globalPass, privateKey, hashedPassword, tmp.alg)
         if privateKey is None:
            error="Wrong password"
-           return b64,auth,encr,zip,error,toRecv
+           return b64,auth,encr,zip,error,toRecv,user
 
         kS = decryptKs(kS, privateKey, tmp.alg)
         toRecv = decryptMsg(data, alg, kS, toRecv["iv"])
@@ -258,12 +259,13 @@ def receiveMessage(email, password, name):
         toRecv = toRecv["data"]
 
         publicKey = publicRing[authKeyID].pu
+        user=publicRing[authKeyID].userID
         print(publicKey)
 
         if not checkAuth(toRecv, digest, publicKey, algAuth):
             error="Signature is not valid!"
 
-    return b64,auth,encr,zip,error ,toRecv
+    return b64,auth,encr,zip,error ,toRecv,user
 
 
 
