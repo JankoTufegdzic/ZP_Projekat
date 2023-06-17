@@ -57,6 +57,7 @@ def onLogin():
     login_username_var.set("")
     login_password_var.set("")
     print(email, password)
+    #TODO: dodacemo niz sa userima,da se proveri da li postoji user.
     goToSimulation()
 
 
