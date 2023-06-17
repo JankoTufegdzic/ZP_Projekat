@@ -30,6 +30,8 @@ def refreshPages():
     backButton = tk.Button(sendMessage, text="Log out", command=backToLogin)
     backButton.grid(row=0, column=0, sticky="nw", padx=10, pady=10)
 
+    updateLists()
+
 
 def updateLists():
     privateKeysList.set('')
@@ -39,7 +41,7 @@ def updateLists():
     publicKeysList['value'] = list(publicRing.keys())
 
     deletePairList.set('')
-    deletePairList['value'] = list(publicRing.keys())
+    deletePairList['value'] = list(privateRing[email]) if email in privateRing.keys() else []
 
 
 def goToSimulation():
