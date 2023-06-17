@@ -4,11 +4,20 @@ from main import  receiveMessage
 
 def receiveMessageFrame(publicRing,privateRing,email):
 
+
     def selectMessage():
         file_path = filedialog.askopenfilename()
         if file_path:
             #TODO: MORA DA UNESE VREDNOST PASSWORDA!!
-            b64,auth,encr,zip,error,toRecv =receiveMessage(email,'1',file_path)
+
+
+            b64,auth,encr,zip,error,toRecv = receiveMessage(email,'1',file_path)
+
+            if error == "":
+                signatureLabel.config(text="Signature is ok!", foreground="green")
+            else:
+                signatureLabel.config(text=error, foreground="red")
+                return
 
 
             authLabel.config(state="normal")
@@ -36,12 +45,6 @@ def receiveMessageFrame(publicRing,privateRing,email):
                 encrLabel.config(foreground="green")
             else:
                 encrLabel.config(foreground="red")
-
-            #neka if provera da li je dobar potpis pa onda:
-            if error=="":
-                signatureLabel.config(text="Signature is ok!",foreground="green")
-            else:
-                signatureLabel.config(text=error, foreground="red")
 
 
             text.insert("1.0", str(toRecv))# text poruke

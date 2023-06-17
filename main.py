@@ -1,6 +1,7 @@
 import ast
 import base64
 import binascii
+import time
 import zlib
 
 from keyManipulation import *
@@ -119,8 +120,6 @@ def generateKeys(name, email, algo, size, password):
         pubID = publicKey.y
 
     addToRings(email, password, privateKey, publicKey, pubID, algo)
-    saveKeyInPemFormat(privateKey, "test", algo)
-
 
 def sendMessage(email, password, msg, name, publicKeyAuthID=None, publicKeyEncrID=None, encrAlg=None, zip=False,
                 base64encode=False):
@@ -173,7 +172,37 @@ def sendMessage(email, password, msg, name, publicKeyAuthID=None, publicKeyEncrI
 
     return True
 
+
+import tkinter as tk
+def openPrompt(id):
+    top = tk.Toplevel()
+
+    top.geometry("200x100")
+    top.title("Enter password")
+
+    entry_label = tk.Label(top, text=f'Enter password for key {id}')
+    entry_label.pack()
+
+    entry_var = tk.StringVar()
+    entry = tk.Entry(top, textvariable=entry_var, show="*")
+    entry.pack()
+
+
+    ok_button = tk.Button(top, text='OK', command=lambda: insertPassword(entry_var.get(), top))
+    ok_button.pack(pady=10, fill="x", padx=20)
+    top.wait_window()
+
+globalPass=""
+def insertPassword(passw, top):
+   global globalPass
+
+   globalPass=passw
+
+   top.destroy()
+
+
 def receiveMessage(email, password, name):
+    global globalPass
     b64=False
     zip=False
     auth=False
@@ -198,9 +227,17 @@ def receiveMessage(email, password, name):
         tmp = privateRing[email][decrKeyID]
         privateKey = tmp.pr
         hashedPassword = tmp.password
-        privateKey = decryptPrivateKey(password, privateKey, hashedPassword, tmp.alg)
+
+        #
+
+        openPrompt(decrKeyID)
+        #
+
+
+        privateKey = decryptPrivateKey(globalPass, privateKey, hashedPassword, tmp.alg)
         if privateKey is None:
-            error="Signature is not ok!"
+           error="Wrong password"
+           return b64,auth,encr,zip,error,toRecv
 
         kS = decryptKs(kS, privateKey, tmp.alg)
         toRecv = decryptMsg(data, alg, kS, toRecv["iv"])
