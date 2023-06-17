@@ -172,7 +172,9 @@ def sendMessage(email, password, msg, name, publicKeyAuthID=None, publicKeyEncrI
         toSend = encrMsg
 
     if base64encode:
-        toSend = base64.b64encode(str(toSend).encode('ascii')).decode('ascii')
+        b64Msg = {}
+        b64Msg['b64'] = base64.b64encode(str(toSend).encode('ascii')).decode('ascii')
+        toSend = base64
 
     with open(name, "w") as sendmsg:
         sendmsg.write(str(toSend))
@@ -182,14 +184,9 @@ def receiveMessage(email, password, name):
     with open(name) as file:
         toRecv = file.read()
 
-    try:
+    if 'b64' in toRecv:
         base64Msg = base64.b64decode(toRecv.encode('ascii')).decode("ascii")
-        toCheck = base64.b64encode(base64Msg.encode('ascii')).decode('ascii')
-
-        if toCheck == toRecv:
-            toRecv = ast.literal_eval(base64Msg)
-    except binascii.Error:
-        pass
+    toRecv = ast.literal_eval(base64Msg)
 
     if "ks" in toRecv:
         kS = toRecv["ks"]
