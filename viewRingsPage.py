@@ -15,7 +15,6 @@ def viewRingsFrame(publicRing:dict,privateRing:dict,email):
     privateRingLabel.pack(anchor="nw", padx=10, pady=10)
 
     privateRingTable = tk.Text(viewRings, height=10,width=80)
-    privateRingTable.config(bg="green")
     privateRingTable.pack(anchor="nw", padx=10, pady=10)
 
     myPrivate=privateRing.get(email)
@@ -32,7 +31,6 @@ def viewRingsFrame(publicRing:dict,privateRing:dict,email):
     publicRingLabel.pack(anchor="nw", padx=10, pady=10)
 
     publicRingTable = tk.Text(viewRings, height=10, width=80)
-    publicRingTable.config(bg="lightblue")
     publicRingTable.pack(anchor="nw", padx=10, pady=10)
 
     i=0
