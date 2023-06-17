@@ -5,7 +5,8 @@ from receiveMessagePage import receiveMessageFrame
 from sendMessagePage import sendMessageFrame
 from viewRingsPage import viewRingsFrame
 
-from main import generateKeys, privateRing, publicRing,loadKeyFromPemFormat,saveKeyInPemFormat
+from main import generateKeys, privateRing, publicRing,loadKeyFromPemFormat,saveKeyInPemFormat,deleteKeys
+from keyManipulation import getHash,decryptPrivateKey
 
 email = None
 password = None
@@ -263,7 +264,7 @@ def privateAddToRing(passw, top,file):
     global privateRing, email
     top.destroy()
 
-    loadKeyFromPemFormat()#TODO: DODATI LINIJU
+    loadKeyFromPemFormat(file,email,passw)
 
 
     updateLists()
@@ -273,7 +274,7 @@ def privateAddToRing(passw, top,file):
     notebook.forget(receiveMessage)
     refreshPages()
 
-    messagebox.showinfo('Result', f'Entered text: {input_text}')
+    messagebox.showinfo('Result', "Import successful")
 
 
 def importPublicKey():
@@ -333,12 +334,16 @@ def exportPrivate():
 
 def checkPassword(input_text, top):
     top.destroy()
-    if input_text != "sifra":
-        messagebox.showinfo('Result', "Netacna lozinka!")
+    hp,hashedPass=getHash(input_text)
+    if hp != privateRing[email][int(privateKey_var.get())].password:
+        messagebox.showinfo('Result', "Wrong password!")
     else:
         file_path = filedialog.asksaveasfilename(defaultextension=".pem")
         if file_path:
-            # Perform the export logic here
+            key=decryptPrivateKey(input_text,privateRing[email][int(privateKey_var.get())].pr,hp,privateRing[email][int(privateKey_var.get())].alg)
+            if key is None:
+                return
+            saveKeyInPemFormat(key,file_path,privateRing[email][int(privateKey_var.get())].alg)
             print("Exporting to:", file_path)
 
 
@@ -359,7 +364,7 @@ def enableDelete(*args):
 
 
 def deletePair(key):
-    # TODO: Ovde brisanje
+    deleteKeys(key,email)
     updateLists()
     print(f"Deleted {key}")
 
@@ -375,7 +380,7 @@ deletePairList = ttk.Combobox(keyImportExport, values=publicKeys, textvariable=d
 deletePairList.grid(row=2, column=5, sticky="nw", padx=10, pady=10)
 
 deleteButton = tk.Button(keyImportExport, text="Delete pair", state=tk.DISABLED,
-                         command=lambda: deletePair(deletePair_var.get()))
+                         command=lambda: deletePair(int(deletePair_var.get())))
 deleteButton.grid(row=3, column=5, sticky="nw", padx=10, pady=10)
 
 deletePair_var.trace("w", enableDelete)
