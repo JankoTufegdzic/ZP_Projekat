@@ -166,8 +166,11 @@ def receiveMessage(email, password, name):
     with open(name) as file:
         toRecv = file.read()
 
-    toRecv = base64.b64decode(toRecv.encode('ascii')).decode("ascii")
-    toRecv = ast.literal_eval(toRecv)
+    base64Msg = base64.b64decode(toRecv.encode('ascii')).decode("ascii")
+    toCheck = base64.b64encode(base64Msg.encode('ascii')).decode('ascii')
+
+    if toCheck == toRecv:
+        toRecv = ast.literal_eval(base64Msg)
 
     if "ks" in toRecv:
         kS = toRecv["ks"]
