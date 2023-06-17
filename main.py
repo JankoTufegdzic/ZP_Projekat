@@ -1,5 +1,6 @@
 import ast
 import base64
+import binascii
 import zlib
 
 from keyManipulation import *
@@ -181,11 +182,14 @@ def receiveMessage(email, password, name):
     with open(name) as file:
         toRecv = file.read()
 
-    base64Msg = base64.b64decode(toRecv.encode('ascii')).decode("ascii")
-    toCheck = base64.b64encode(base64Msg.encode('ascii')).decode('ascii')
+    try:
+        base64Msg = base64.b64decode(toRecv.encode('ascii')).decode("ascii")
+        toCheck = base64.b64encode(base64Msg.encode('ascii')).decode('ascii')
 
-    if toCheck == toRecv:
-        toRecv = ast.literal_eval(base64Msg)
+        if toCheck == toRecv:
+            toRecv = ast.literal_eval(base64Msg)
+    except binascii.Error:
+        pass
 
     if "ks" in toRecv:
         kS = toRecv["ks"]
