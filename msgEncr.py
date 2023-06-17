@@ -54,10 +54,14 @@ def encryptKs(kS, publicKey, alg):
         return publicKey._encrypt(int.from_bytes(kS, 'big'), int(random.randint(1, publicKey.p - 1)))
 
 
-def decryptKs(kS, privateKey, alg):
+def decryptKs(kS, privateKey, alg, encrAlg):
     if alg == "RSA":
         #return rsa.decrypt(kS, privateKey)
         rsaKey = PKCS1_OAEP.new(privateKey)
         return rsaKey.decrypt(kS)
     else:
-        return privateKey._decrypt(tuple(kS)).to_bytes(24, 'big')
+        if encrAlg == "AES":
+            size = 16
+        else:
+            size = 24
+        return privateKey._decrypt(tuple(kS)).to_bytes(size, 'big')

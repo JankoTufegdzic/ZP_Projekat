@@ -8,10 +8,8 @@ from keyManipulation import *
 from msgAuth import *
 from msgEncr import *
 
-
 publicRing = {}
 privateRing = {}
-
 
 
 def deleteKeys(keyID, email):
@@ -122,6 +120,7 @@ def generateKeys(name, email, algo, size, password):
 
     addToRings(email, password, privateKey, publicKey, pubID, algo)
 
+
 def sendMessage(email, password, msg, name, publicKeyAuthID=None, publicKeyEncrID=None, encrAlg=None, zip=False,
                 base64encode=False):
     global privateRing, publicRing
@@ -175,6 +174,8 @@ def sendMessage(email, password, msg, name, publicKeyAuthID=None, publicKeyEncrI
 
 
 import tkinter as tk
+
+
 def openPrompt(id):
     top = tk.Toplevel()
 
@@ -188,28 +189,30 @@ def openPrompt(id):
     entry = tk.Entry(top, textvariable=entry_var, show="*")
     entry.pack()
 
-
     ok_button = tk.Button(top, text='OK', command=lambda: insertPassword(entry_var.get(), top))
     ok_button.pack(pady=10, fill="x", padx=20)
     top.wait_window()
 
-globalPass=""
+
+globalPass = ""
+
+
 def insertPassword(passw, top):
-   global globalPass
+    global globalPass
 
-   globalPass=passw
+    globalPass = passw
 
-   top.destroy()
+    top.destroy()
 
 
 def receiveMessage(email, password, name):
     global globalPass
-    b64=False
-    zip=False
-    auth=False
-    encr=False
-    error=""
-    user=""
+    b64 = False
+    zip = False
+    auth = False
+    encr = False
+    error = ""
+    user = ""
 
     with open(name) as file:
         toRecv = file.read()
@@ -217,10 +220,10 @@ def receiveMessage(email, password, name):
     toRecv = eval(toRecv)
     if 'b64' in toRecv:
         toRecv = eval(base64.b64decode(toRecv['b64'].encode('ascii')).decode("ascii"))
-        b64=True
+        b64 = True
 
     if "ks" in toRecv:
-        encr=True
+        encr = True
         kS = toRecv["ks"]
         decrKeyID = toRecv["encrKeyID"]
         data = toRecv["data"]
@@ -235,23 +238,22 @@ def receiveMessage(email, password, name):
         openPrompt(decrKeyID)
         #
 
-
         privateKey = decryptPrivateKey(globalPass, privateKey, hashedPassword, tmp.alg)
         if privateKey is None:
-           error="Wrong password"
-           return b64,auth,encr,zip,error,toRecv,user
+            error = "Wrong password"
+            return b64, auth, encr, zip, error, toRecv, user
 
-        kS = decryptKs(kS, privateKey, tmp.alg)
+        kS = decryptKs(kS, privateKey, tmp.alg, alg)
         toRecv = decryptMsg(data, alg, kS, toRecv["iv"])
 
         toRecv = eval(toRecv.decode("utf-8"))
 
     if "zip" in toRecv:
-        zip=True
+        zip = True
         toRecv = eval(zlib.decompress(toRecv['zip']).decode('utf-8'))
 
     if "digest" in toRecv:
-        auth=True
+        auth = True
         digest = toRecv["digest"]
         octets = toRecv["octets"]
         authKeyID = toRecv["authKeyID"]
@@ -260,14 +262,13 @@ def receiveMessage(email, password, name):
         toRecv = toRecv["data"]
 
         publicKey = publicRing[authKeyID].pu
-        user=publicRing[authKeyID].userID
+        user = publicRing[authKeyID].userID
         print(publicKey)
 
         if not checkAuth(toRecv, digest, publicKey, algAuth):
-            error="Signature is not valid!"
+            error = "Signature is not valid!"
 
-    return b64,auth,encr,zip,error ,toRecv,user
-
+    return b64, auth, encr, zip, error, toRecv, user
 
 
 if __name__ == '__main__':
