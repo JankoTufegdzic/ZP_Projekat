@@ -28,13 +28,14 @@ def saveKeyInPemFormat(key, title, algo):
     elif algo == "ElGamal":
         with open(f'keys/{title}.pem', 'wb') as p:
             toWrite = {}
-            toWrite["p"] = key.p
-            toWrite["g"] = key.g
-            toWrite["y"] = key.y
-            toWrite["x"] = key.x
-            p.write("-----BEGIN ELGAMAL PUBLIC KEY-----".encode('utf-8'))
+            toWrite["p"] = int(key.p)
+            toWrite["g"] = int(key.g)
+            toWrite["y"] = int(key.y)
+            if hasattr(key, 'x'):
+                toWrite["x"] = int(key.x)
+            p.write("-----BEGIN ELGAMAL PUBLIC KEY-----\n".encode('utf-8'))
             p.write(bytearray(str(toWrite).encode('utf-8')))
-            p.write("-----END ELGAMAL PUBLIC KEY-----".encode('utf-8'))
+            p.write("\n-----END ELGAMAL PUBLIC KEY-----".encode('utf-8'))
             p.close()
 
 
@@ -61,9 +62,9 @@ def loadPublicKeyFromPemFormat(title, email):  # izmeniti za elgamal i dsa
             publicKey = rsa.PublicKey.load_pkcs1(p.read())
             publicRing[publicKey["n"] % (2 ** 64)] = PublicRingStruct(publicKey, "RSA", email)
         elif firstLine.find("ELGAMAL") != -1:
-            publicKey = eval(p.read().decode('utf-8'))
+            publicKey = eval((p.readline()).decode('utf-8'))
             publicKey = ElGamal.construct((int(publicKey["p"]), int(publicKey["g"]), int(publicKey["y"])))
-            publicRing[publicKey.y % (2 ** 64)] = PublicRingStruct(publicKey, "ElGamal", email)
+            publicRing[int(publicKey.y) % (2 ** 64)] = PublicRingStruct(publicKey, "ElGamal", email)
         else:
             p.seek(0)
             publicKey = DSA.import_key(p.read())
