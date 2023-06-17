@@ -5,7 +5,7 @@ from receiveMessagePage import receiveMessageFrame
 from sendMessagePage import sendMessageFrame
 from viewRingsPage import viewRingsFrame
 
-from main import generateKeys, privateRing, publicRing
+from main import generateKeys, privateRing, publicRing,loadKeyFromPemFormat,saveKeyInPemFormat
 
 email = None
 password = None
@@ -286,8 +286,7 @@ def importPublicKey():
     if file_path:
         print("Selected file:", file_path)
 
-        # TODO:Ovde dodamo u ring
-        publicRing["janko"] = "janko"
+        loadKeyFromPemFormat(file_path,email)
 
         # Update padajuce liste
         updateLists()

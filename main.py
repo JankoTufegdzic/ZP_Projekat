@@ -41,8 +41,8 @@ def saveKeyInPemFormat(key, title, algo):
             p.close()
 
 
-def loadKeyFromPemFormat(title, email, password):  # izmeniti za elgamal i dsa
-    with open(f'keys/{title}.pem', 'rb') as p:
+def loadKeyFromPemFormat(title, email, password=None ):  # izmeniti za elgamal i dsa
+    with open(title, 'rb') as p:
         publicKey = None
         firstLine = p.readline().decode('utf-8')
         if firstLine.find("RSA") != -1:
