@@ -2,14 +2,14 @@ import tkinter as tk
 from tkinter import ttk , messagebox,filedialog
 from main import  receiveMessage
 
-def receiveMessageFrame(publicRing,privateRing,email,password):
+def receiveMessageFrame(publicRing,privateRing,email):
 
     def selectMessage():
         file_path = filedialog.askopenfilename()
         if file_path:
             #TODO: MORA DA UNESE VREDNOST PASSWORDA!!
-            receiveMessage(email,'1',file_path)
-            #TODO: obrada prijema, bojenje labela,i promeniti receiveMessage da vraca vrednosti!
+            b64,auth,encr,zip,error ,toRecv=receiveMessage(email,'1',file_path)
+
 
             authLabel.config(state="normal")
             encrLabel.config(state="normal")
@@ -19,18 +19,32 @@ def receiveMessageFrame(publicRing,privateRing,email,password):
             text.config(state="normal")
             saveButton.config(state="normal")
 
-            authLabel.config(foreground="red")
-            zipLabel.config(foreground="green")
-            base64Label.config(foreground="green")
-            encrLabel.config(foreground="red")
+            if auth:
+                authLabel.config(foreground="green")
+            else:
+                authLabel.config(foreground="red")
+
+            if zip:
+                zipLabel.config(foreground="green")
+            else:
+                zipLabel.config(foreground="red")
+            if b64:
+                base64Label.config(foreground="green")
+            else:
+                base64Label.config(foreground="red")
+            if encr:
+                encrLabel.config(foreground="green")
+            else:
+                encrLabel.config(foreground="red")
 
             #neka if provera da li je dobar potpis pa onda:
-            signatureLabel.config(text="Signature is ok!",foreground="green")
+            if error=="":
+                signatureLabel.config(text="Signature is ok!",foreground="green")
+            else:
+                signatureLabel.config(text=error, foreground="red")
 
-            #else
-            #signatureLabel.config(text="Signature is ok!",foreground="red")
 
-            text.insert("1.0", "Ide gas")# text poruke
+            text.insert("1.0", str(toRecv))# text poruke
 
     def saveMessage():
         file_path = filedialog.asksaveasfilename(defaultextension=".txt")

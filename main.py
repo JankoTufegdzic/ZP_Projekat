@@ -8,18 +8,9 @@ from msgAuth import *
 from msgEncr import *
 
 
-class User:
-    def __init__(self, username, name):
-        self.username = username
-        self.name = name
-
-    def __str__(self):
-        return "username: " + str(self.username) + ", name: " + str(self.name)
-
-
 publicRing = {}
 privateRing = {}
-users = {}
+
 
 
 def deleteKeys(keyID, email):
@@ -174,21 +165,30 @@ def sendMessage(email, password, msg, name, publicKeyAuthID=None, publicKeyEncrI
     if base64encode:
         b64Msg = {}
         b64Msg['b64'] = base64.b64encode(str(toSend).encode('ascii')).decode('ascii')
-        toSend = base64
+        toSend = b64Msg
 
     with open(name, "w") as sendmsg:
+        print(str(toSend))
         sendmsg.write(str(toSend))
 
 
 def receiveMessage(email, password, name):
+    b64=False
+    zip=False
+    auth=False
+    encr=False
+    error=""
+
     with open(name) as file:
         toRecv = file.read()
 
-    toRecv = ast.literal_eval(toRecv)
+    toRecv = eval(toRecv)
     if 'b64' in toRecv:
-        toRecv = base64.b64decode(toRecv.encode('ascii')).decode("ascii")
+        toRecv = eval(base64.b64decode(toRecv['b64'].encode('ascii')).decode("ascii"))
+        b64=True
 
     if "ks" in toRecv:
+        encr=True
         kS = toRecv["ks"]
         decrKeyID = toRecv["encrKeyID"]
         data = toRecv["data"]
@@ -206,10 +206,12 @@ def receiveMessage(email, password, name):
 
         toRecv = eval(toRecv.decode("utf-8"))
 
-    if "zip" in toRecv.keys:
+    if "zip" in toRecv:
+        zip=True
         toRecv = eval(zlib.decompress(toRecv['zip']).decode('utf-8'))
 
     if "digest" in toRecv:
+        auth=True
         digest = toRecv["digest"]
         octets = toRecv["octets"]
         authKeyID = toRecv["authKeyID"]
@@ -221,9 +223,10 @@ def receiveMessage(email, password, name):
         print(publicKey)
 
         if not checkAuth(toRecv, digest, publicKey, algAuth):
-            return "error"
+            error="Signature is not valid!"
 
-    print(toRecv)
+    return b64,auth,encr,zip,error ,toRecv
+
 
 
 if __name__ == '__main__':

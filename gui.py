@@ -11,13 +11,23 @@ from keyManipulation import getHash,decryptPrivateKey
 email = None
 password = None
 
+class User:
+    def __init__(self, username, name):
+        self.username = username
+        self.name = name
+
+    def __str__(self):
+        return "username: " + str(self.username) + ", name: " + str(self.name)
+
+
+users=[User("j","janko"),User("i","iva")]
 
 def refreshPages():
     global viewRings, sendMessage, receiveMessage, email
 
     viewRings = viewRingsFrame(publicRing, privateRing, email)
     sendMessage = sendMessageFrame(publicRing, privateRing, email,password)
-    receiveMessage = receiveMessageFrame(publicRing, privateRing, email, password)
+    receiveMessage = receiveMessageFrame(publicRing, privateRing, email)
 
     notebook.add(main_tab, text="Keys")
     notebook.add(sendMessage, text="Send Message")
@@ -51,14 +61,25 @@ def goToSimulation():
 
 
 def onLogin():
-    global email, password
+    global email
     email = login_username_entry.get()
-    password = login_password_entry.get()
+
+
     login_username_var.set("")
-    login_password_var.set("")
-    print(email, password)
+
     #TODO: dodacemo niz sa userima,da se proveri da li postoji user.
-    goToSimulation()
+    for user in users:
+        if user.username==email:
+            email_var.set(email)
+            email_entry.config(state="readonly")
+            username_var.set(user.name)
+            username_entry.config(state="readonly")
+            errorLabel.grid_forget()
+            goToSimulation()
+            return
+
+    errorLabel.grid(row=6, column=0, columnspan=2, padx=10, pady=10)
+
 
 
 def backToLogin():
@@ -81,7 +102,7 @@ login_tab = tk.Frame(notebook)
 notebook.add(login_tab, text="Login")
 
 sendMessage = sendMessageFrame(publicRing, privateRing, email,password)
-receiveMessage = receiveMessageFrame(publicRing, privateRing, email, password)
+receiveMessage = receiveMessageFrame(publicRing, privateRing, email)
 viewRings = viewRingsFrame(publicRing, privateRing, email)
 main_tab = tk.Frame(notebook)
 
@@ -99,7 +120,7 @@ notebook.hide(viewRings)
 # LOGIN PAGE
 
 def validate_entries(*args):
-    if login_password_var.get() and login_username_var.get():
+    if login_username_var.get():
         login_button.config(state=tk.NORMAL)
     else:
         login_button.config(state=tk.DISABLED)
@@ -109,22 +130,23 @@ login_label = tk.Label(login_tab, text="Log in", font=("Arial", 26), foreground=
 login_label.grid(row=0, column=0, rowspan=2, columnspan=2, pady=100)
 
 login_email_label = tk.Label(login_tab, text="Email:", font=("Arial", 12))
-password_label = tk.Label(login_tab, text="Password:", font=("Arial", 12))
+
 login_email_label.grid(row=3, column=0, padx=10, pady=10, sticky="e")
-password_label.grid(row=4, column=0, padx=10, pady=5, sticky="e")
+
 
 login_username_var = tk.StringVar()
 login_username_entry = tk.Entry(login_tab, font=("Arial", 12), textvariable=login_username_var)
-login_password_var = tk.StringVar()
-login_password_entry = tk.Entry(login_tab, show="*", font=("Arial", 12), textvariable=login_password_var)
 login_username_entry.grid(row=3, column=1, padx=10, pady=5)
-login_password_entry.grid(row=4, column=1, padx=10, pady=5)
 
 login_username_var.trace("w", validate_entries)
-login_password_var.trace("w", validate_entries)
+
 
 login_button = tk.Button(login_tab, text="Login", command=onLogin, font=("Arial", 16, "bold"), state=tk.DISABLED)
 login_button.grid(row=5, column=0, columnspan=2, padx=10, pady=10)
+
+errorLabel=tk.Label(login_tab,text="User does not exists!",fg="red",font=("Arial", 12))
+errorLabel.grid(row=6, column=0, columnspan=2, padx=10, pady=10)
+errorLabel.grid_forget()
 
 login_tab.columnconfigure(0, weight=1)
 login_tab.columnconfigure(1, weight=1)
@@ -217,7 +239,7 @@ email_var = tk.StringVar()
 email_entry = tk.Entry(keyGen, textvariable=email_var)
 email_entry.grid(row=1, column=3, sticky="nw", padx=10, pady=10)
 
-username_label = tk.Label(keyGen, text="Username:")
+username_label = tk.Label(keyGen, text="Name:")
 username_label.grid(row=2, column=2, sticky="nw", padx=10, pady=10)
 
 username_var = tk.StringVar()
