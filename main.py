@@ -20,9 +20,11 @@ def saveKeyInPemFormat(key, title, algo):
     if algo == "RSA":
         with open(f'keys/{title}.pem', 'wb') as p:
             p.write(key.save_pkcs1('PEM'))
+            p.close()
     elif algo == "DSA":
         with open(f'keys/{title}.pem', 'wb') as p:
             p.write(key.export_key('PEM'))
+            p.close()
     elif algo == "ElGamal":
         with open(f'keys/{title}.pem', 'wb') as p:
             toWrite = {}
@@ -30,7 +32,10 @@ def saveKeyInPemFormat(key, title, algo):
             toWrite["g"] = key.g
             toWrite["y"] = key.y
             toWrite["x"] = key.x
+            p.write("-----BEGIN ELGAMAL PUBLIC KEY-----".encode('utf-8'))
             p.write(bytearray(str(toWrite).encode('utf-8')))
+            p.write("-----END ELGAMAL PUBLIC KEY-----".encode('utf-8'))
+            p.close()
 
 
 def loadPrivateKeyFromPemFormat(title, email, password):  # izmeniti za elgamal i dsa
@@ -50,8 +55,21 @@ def loadPrivateKeyFromPemFormat(title, email, password):  # izmeniti za elgamal 
 
 def loadPublicKeyFromPemFormat(title, email):  # izmeniti za elgamal i dsa
     with open(f'keys/{title}.pem', 'rb') as p:
-        publicKey = rsa.PublicKey.load_pkcs1(p.read())
-        publicRing[publicKey["n"] % (2 ** 64)] = PublicRingStruct(publicKey, "RSA", email)
+        firstLine = p.readline().decode('utf-8')
+        if firstLine.find("RSA") != -1:
+            p.seek(0)
+            publicKey = rsa.PublicKey.load_pkcs1(p.read())
+            publicRing[publicKey["n"] % (2 ** 64)] = PublicRingStruct(publicKey, "RSA", email)
+        elif firstLine.find("ELGAMAL") != -1:
+            publicKey = eval(p.read().decode('utf-8'))
+            publicKey = ElGamal.construct((int(publicKey["p"]), int(publicKey["g"]), int(publicKey["y"])))
+            publicRing[publicKey.y % (2 ** 64)] = PublicRingStruct(publicKey, "ElGamal", email)
+        else:
+            p.seek(0)
+            publicKey = DSA.import_key(p.read())
+            print(publicKey)
+            publicRing[publicKey.y % (2 ** 64)] = PublicRingStruct(publicKey, "DSA", email)
+        p.close()
         return publicKey
 
 
@@ -184,16 +202,5 @@ def receiveMessage(email, password, name):
 
 if __name__ == '__main__':
     print('ZP Projekat v1.1')
-    generateKeys()  # dodati elgamal-dsa, publicRing
-    print("done")
-    generateKeys()
-    # # print(loadPrivateKeyFromPemFormat("test"))
-    email = input("Uneti email: ")
-    password = input("Uneti sifru: ")
-    pr = list(privateRing[email].items())[0][0]
-    pu = list(publicRing.items())[1][0]
-    print(pr, pu)
-    sendMessage(email, password, "radi molim te", "test", pr, pu, "3DES")
-    email = input("Uneti email: ")
-    password = input("Uneti sifru: ")
-    receiveMessage(email, password, "test")
+    generateKeys("iva", "iva", "ElGamal", 1024, "123")
+    loadPublicKeyFromPemFormat("test", "iva")
