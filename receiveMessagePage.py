@@ -8,7 +8,7 @@ def receiveMessageFrame(publicRing,privateRing,email):
         file_path = filedialog.askopenfilename()
         if file_path:
             #TODO: MORA DA UNESE VREDNOST PASSWORDA!!
-            b64,auth,encr,zip,error ,toRecv=receiveMessage(email,'1',file_path)
+            b64,auth,encr,zip,error,toRecv =receiveMessage(email,'1',file_path)
 
 
             authLabel.config(state="normal")

@@ -8,7 +8,7 @@ def sendMessageFrame(publicRing,privateRing,email,password):
     def toggle_encryption_visibility():
         if encr_var.get() == 1:
             publicLabel.config(state="normal")
-            encrKeyId_list.config(state="normal")
+            encrKeyId_list.config(state="readonly")
             algoLabel.config(state="normal")
             algo_list.config(state="normal")
             userLabel.config(state="normal")
@@ -24,7 +24,7 @@ def sendMessageFrame(publicRing,privateRing,email,password):
     def toggle_authentication_visibility():
         if auth_var.get() == 1:
             privateLabel.config(state="normal")
-            authKeyId_list.config(state="normal")
+            authKeyId_list.config(state="readonly")
         else:
             privateLabel.config(state="disabled")
             authKeyId_list.config(state="disabled")
@@ -46,7 +46,7 @@ def sendMessageFrame(publicRing,privateRing,email,password):
         ok_button = tk.Button(top, text='OK', command=lambda: checkPassword(entry_var.get(), top,passw))
         ok_button.pack(pady=10, fill="x", padx=20)
 
-    authPass=None
+    authPass=""
     def checkPassword(input_text, top,passw):
         global authPass
         top.destroy()
@@ -79,9 +79,10 @@ def sendMessageFrame(publicRing,privateRing,email,password):
                 b64=True
             print(publicKeyAuthId,publicKeyEncrId,encrAlg,zip,b64)
 
-            sendMessage(email, authPass, text.get("1.0",'end-1c'), file_path, publicKeyAuthID=publicKeyAuthId, publicKeyEncrID=publicKeyEncrId, encrAlg=encrAlg,zip=zip,base64encode=b64)
-           #generate message and save file here
-            print("Exporting to:", file_path)
+            flag=sendMessage(email, authPass, text.get("1.0",'end-1c'), file_path, publicKeyAuthID=publicKeyAuthId, publicKeyEncrID=publicKeyEncrId, encrAlg=encrAlg,zip=zip,base64encode=b64)
+            if flag==False:
+                messagebox.showerror("Error","Wrong password")
+
     def getForUser(id):
         lista=[]
         for  key in publicRing:
@@ -123,8 +124,8 @@ def sendMessageFrame(publicRing,privateRing,email,password):
     def changeUser(*args):
         newId=toUser_var.get()
         publicKeys=getForUser(newId)
-        encrKeyId_list = ttk.OptionMenu(sendMessageFrame, encrKeyId_var, *publicKeys)
-        encrKeyId_list.grid(row=3, column=3, sticky="nw", padx=10, pady=10)
+        encrKeyId_list['values']=publicKeys
+
 
     sendMessageFrame = tk.Frame()
 
@@ -158,12 +159,13 @@ def sendMessageFrame(publicRing,privateRing,email,password):
     base64Label.grid(row=4, column=0, sticky="nw", padx=10, pady=10)
 
     if email in privateRing.keys():
-        privateKeys =[]
+        privateKeys = []
         for i in privateRing[email].keys():
-            if privateRing[email][i].alg != "ElGamal":
+            algo = options_var.get()
+            if privateRing[email][i].alg != "ElGamal" and algo.find(privateRing[email][i].alg) != -1:
                 privateKeys.append(i)
     else:
-        privateKeys=[]
+        privateKeys = []
 
     users = getUsers()
     publicKeys =getInitialPublic()
@@ -205,7 +207,7 @@ def sendMessageFrame(publicRing,privateRing,email,password):
     publicLabel = tk.Label(sendMessageFrame, text="Public key ID:", font=("Arial", 10), state="disabled")
     publicLabel.grid(row=3, column=2, sticky="nw", padx=10, pady=10)
 
-    encrKeyId_var = tk.StringVar()
+    encrKeyId_var = tk.StringVar(value="Choose Id")
     encrKeyId_list = ttk.Combobox(sendMessageFrame, textvariable=encrKeyId_var,values=publicKeys)
     encrKeyId_list.config(state="disabled")
     encrKeyId_list.grid(row=3, column=3, sticky="nw", padx=10, pady=10)

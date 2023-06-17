@@ -134,7 +134,7 @@ def sendMessage(email, password, msg, name, publicKeyAuthID=None, publicKeyEncrI
         tmp = privateRing[email][publicKeyAuthID]
         privateKeyAuth = decryptPrivateKey(password, tmp.pr, tmp.password, tmp.alg)
         if privateKeyAuth is None:
-            return "error"
+            return False
         authAlg = tmp.alg
 
         authMsg = {}
@@ -171,6 +171,7 @@ def sendMessage(email, password, msg, name, publicKeyAuthID=None, publicKeyEncrI
         print(str(toSend))
         sendmsg.write(str(toSend))
 
+    return True
 
 def receiveMessage(email, password, name):
     b64=False
@@ -199,7 +200,7 @@ def receiveMessage(email, password, name):
         hashedPassword = tmp.password
         privateKey = decryptPrivateKey(password, privateKey, hashedPassword, tmp.alg)
         if privateKey is None:
-            return "error"
+            error="Signature is not ok!"
 
         kS = decryptKs(kS, privateKey, tmp.alg)
         toRecv = decryptMsg(data, alg, kS, toRecv["iv"])
