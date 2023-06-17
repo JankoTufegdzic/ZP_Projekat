@@ -40,7 +40,8 @@ def saveKeyInPemFormat(key, title, algo):
             if hasattr(key, 'x'):
                 toWrite["x"] = int(key.x)
             p.write("-----BEGIN ELGAMAL PUBLIC KEY-----\n".encode('utf-8'))
-            toWrite = base64.b64encode(str(toWrite).encode('ascii'))
+            # toWrite = base64.b64encode(str(toWrite).encode('ascii'))
+            toWrite = str(toWrite).encode('utf-8')
             p.write(toWrite)
             p.write("\n-----END ELGAMAL PUBLIC KEY-----".encode('utf-8'))
             p.close()
@@ -60,9 +61,9 @@ def loadKeyFromPemFormat(title, email, password=None):  # izmeniti za elgamal i 
             else:
                 publicRing[algKeys.n % (2 ** 64)] = PublicRingStruct(algKeys, "RSA", email)
         elif firstLine.find("ELGAMAL") != -1:
-            algKeys = eval(base64.b64decode(p.readline()).decode("ascii"))
+            # algKeys = eval(base64.b64decode(p.readline()).decode("ascii"))
             print(algKeys)
-            # keys = eval((p.readline()).decode('utf-8'))
+            algKeys = eval((p.readline()).decode('utf-8'))
             if "x" in algKeys:
                 privateKey = ElGamal.construct(
                     (int(algKeys["p"]), int(algKeys["g"]), int(algKeys["y"]), int(algKeys["x"])))

@@ -46,7 +46,7 @@ def sendMessageFrame(publicRing,privateRing,email,password):
         ok_button = tk.Button(top, text='OK', command=lambda: checkPassword(entry_var.get(), top,passw))
         ok_button.pack(pady=10, fill="x", padx=20)
 
-    authPass=""
+
     def checkPassword(input_text, top,passw):
         global authPass
         top.destroy()
@@ -79,7 +79,11 @@ def sendMessageFrame(publicRing,privateRing,email,password):
                 b64=True
             print(publicKeyAuthId,publicKeyEncrId,encrAlg,zip,b64)
 
-            flag=sendMessage(email, authPass, text.get("1.0",'end-1c'), file_path, publicKeyAuthID=publicKeyAuthId, publicKeyEncrID=publicKeyEncrId, encrAlg=encrAlg,zip=zip,base64encode=b64)
+            if auth_var.get()==1:
+                flag=sendMessage(email, authPass, text.get("1.0",'end-1c'), file_path, publicKeyAuthID=publicKeyAuthId, publicKeyEncrID=publicKeyEncrId, encrAlg=encrAlg,zip=zip,base64encode=b64)
+            else:
+                flag=sendMessage(email, "", text.get("1.0",'end-1c'), file_path, publicKeyAuthID=publicKeyAuthId, publicKeyEncrID=publicKeyEncrId, encrAlg=encrAlg,zip=zip,base64encode=b64)
+
             if flag==False:
                 messagebox.showerror("Error","Wrong password")
 
@@ -123,6 +127,7 @@ def sendMessageFrame(publicRing,privateRing,email,password):
 
     def changeUser(*args):
         newId=toUser_var.get()
+        print(newId)
         publicKeys=getForUser(newId)
         encrKeyId_list['values']=publicKeys
 

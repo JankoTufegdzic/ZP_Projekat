@@ -39,7 +39,8 @@ def decryptMsg(eMsg, alg, kS, iv):
         msg = unpad(cipher.decrypt(eMsg), DES3.block_size)
     elif alg == "AES":
         cipher = AES.new(kS, AES.MODE_CBC, iv=iv)
-        msg = unpad(cipher.decrypt(eMsg), AES.block_size)
+        m=cipher.decrypt(eMsg)
+        msg = unpad(m, AES.block_size)
 
     return msg
 
