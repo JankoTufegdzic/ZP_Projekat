@@ -47,7 +47,7 @@ def loadKeyFromPemFormat(title, email, password=None ):  # izmeniti za elgamal i
         firstLine = p.readline().decode('utf-8')
         if firstLine.find("RSA") != -1:
             keys = RSA.import_key(p.read())
-            if publicKey.has_private():
+            if keys.has_private():
                 publicKey = keys.public_key()
                 privateKey = keys
                 puID = publicKey.n
@@ -56,13 +56,13 @@ def loadKeyFromPemFormat(title, email, password=None ):  # izmeniti za elgamal i
                 publicRing[keys.n % (2 ** 64)] = PublicRingStruct(keys, "RSA", email)
         elif firstLine.find("ELGAMAL") != -1:
             keys = eval((p.readline()).decode('utf-8'))
-            if "x" in publicKey.keys:
+            if "x" in keys.keys:
                 privateKey = ElGamal.construct((int(keys["p"]), int(keys["g"]), int(keys["y"], int(keys["x"]))))
                 publicKey = privateKey.publickey()
                 puID = publicKey.y
                 addToRings(email, password, privateKey, publicKey, puID, "ElGamal")
             else:
-                publicKey = ElGamal.construct((int(keys["p"]), int(keys["g"]), int(keys["y"])))
+                keys = ElGamal.construct((int(keys["p"]), int(keys["g"]), int(keys["y"])))
                 publicRing[int(keys.y) % (2 ** 64)] = PublicRingStruct(keys, "ElGamal", email)
         elif firstLine.find("DSA") != -1:
             keys = DSA.import_key(p.read())
@@ -140,7 +140,9 @@ def sendMessage(email, password, msg, name, publicKeyAuthID=None, publicKeyEncrI
         toSend = authMsg
 
     if zip:
-        toSend = zlib.compress(str(toSend).encode('utf-8'))
+        zipMsg = {}
+        zipMsg["zip"] = zlib.compress(str(toSend).encode('utf-8'))
+        toSend = zipMsg
 
     if publicKeyEncrID is not None:
         encrMsg = {}
@@ -185,7 +187,8 @@ def receiveMessage(email, password, name):
 
         toRecv = eval(toRecv.decode("utf-8"))
 
-    toRecv = eval(zlib.decompress(toRecv).decode('utf-8'))
+    if "zip" in toRecv.keys:
+        toRecv = eval(zlib.decompress(toRecv).decode('utf-8'))
 
     if "digest" in toRecv:
         digest = toRecv["digest"]
