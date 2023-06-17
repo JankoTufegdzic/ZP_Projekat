@@ -18,17 +18,17 @@ def deleteKeys(keyID, email):
 
 def saveKeyInPemFormat(key, title, algo):
     if algo == "RSA":
-        with open(f'keys/{title}.pem', 'wb') as p:
+        with open(title, 'wb') as p:
             p.write("RSA\n".encode('utf-8'))
             p.write(key.export_key('PEM'))
             p.close()
     elif algo == "DSA":
-        with open(f'keys/{title}.pem', 'wb') as p:
+        with open(title, 'wb') as p:
             p.write("DSA\n".encode('utf-8'))
             p.write(key.export_key('PEM'))
             p.close()
     elif algo == "ElGamal":
-        with open(f'keys/{title}.pem', 'wb') as p:
+        with open(title, 'wb') as p:
             toWrite = {}
             toWrite["p"] = int(key.p)
             toWrite["g"] = int(key.g)

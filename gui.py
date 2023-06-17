@@ -32,7 +32,7 @@ def refreshPages():
 
 def updateLists():
     privateKeysList.set('')
-    privateKeysList['value'] = list(privateRing[email].keys())
+    privateKeysList['value'] = list(privateRing[email]) if email in privateRing.keys() else []
 
     publicKeysList.set('')
     publicKeysList['value'] = list(publicRing.keys())
@@ -255,21 +255,17 @@ def importPrivateKey():
         entry = tk.Entry(top, textvariable=entry_var, show="*")
         entry.pack()
 
-        ok_button = tk.Button(top, text='OK', command=lambda: privateAddToRing(entry_var.get(), top))
+        ok_button = tk.Button(top, text='OK', command=lambda: privateAddToRing(entry_var.get(), top,file_path))
         ok_button.pack(pady=10, fill="x", padx=20)
 
 
-def privateAddToRing(input_text, top):
+def privateAddToRing(passw, top,file):
     global privateRing, email
     top.destroy()
-    # TODO: OVDE SE DODAJE U PRSTEN I SIFRUJE!
 
-    # ovo je samo proba za osvezavanje
-    if email not in privateRing.keys():
-        privateRing[email] = {}
+    loadKeyFromPemFormat()#TODO: DODATI LINIJU
 
-    privateRing[email][0] = "janko"
-    #
+
     updateLists()
 
     notebook.forget(sendMessage)
@@ -315,7 +311,7 @@ def enablePublic(*args):
 def exportPublic():
     file_path = filedialog.asksaveasfilename(defaultextension=".pem")
     if file_path:
-        # Perform the export logic here
+        saveKeyInPemFormat(publicRing[int(publicKey_var.get())].pu,file_path,publicRing[int(publicKey_var.get())].alg)
         print("Exporting to:", file_path)
 
 
