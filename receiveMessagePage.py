@@ -7,7 +7,8 @@ def receiveMessageFrame(publicRing,privateRing,email,password):
     def selectMessage():
         file_path = filedialog.askopenfilename()
         if file_path:
-            receiveMessage(email,password,file_path)
+            #TODO: MORA DA UNESE VREDNOST PASSWORDA!!
+            receiveMessage(email,'1',file_path)
             #TODO: obrada prijema, bojenje labela,i promeniti receiveMessage da vraca vrednosti!
 
             authLabel.config(state="normal")
