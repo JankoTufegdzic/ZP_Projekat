@@ -2,7 +2,7 @@ from Cryptodome.Cipher import CAST
 from Cryptodome.Hash import SHA1
 import rsa
 
-from Cryptodome.PublicKey import DSA, ElGamal
+from Cryptodome.PublicKey import DSA, ElGamal, RSA
 from Cryptodome.Random import get_random_bytes
 import datetime
 
@@ -45,7 +45,7 @@ def encryptPrivateKey(password, key, algo):
     cipher = CAST.new(bytearray(hashedPassword.encode('utf-8')), CAST.MODE_OPENPGP)
     plain = None
     if algo == "RSA":
-        plain = key.save_pkcs1('PEM')
+        plain = key.export_key('PEM')
     elif algo == "DSA":
         plain = key.export_key('PEM')
     else:
@@ -69,7 +69,7 @@ def decryptPrivateKey(password, key, hashedPass, algo):
 
     tmp = tmp.decode('utf-8')
     if algo == "RSA":
-        return rsa.PrivateKey.load_pkcs1(tmp)
+        return RSA.import_key(tmp)#rsa.PrivateKey.load_pkcs1(tmp)
     elif algo == "DSA":
         return DSA.import_key(tmp)
     else:
@@ -78,7 +78,7 @@ def decryptPrivateKey(password, key, hashedPass, algo):
 
 
 def generateKeysRSA(size):
-    return rsa.newkeys(size)
+    return RSA.generate(size)#rsa.newkeys(size)
 
 
 def generateKeysDSA(size):
