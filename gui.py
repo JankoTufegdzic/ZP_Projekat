@@ -15,8 +15,8 @@ def refreshPages():
     global viewRings, sendMessage, receiveMessage, email
 
     viewRings = viewRingsFrame(publicRing, privateRing, email)
-    sendMessage = sendMessageFrame(publicRing, privateRing,email)
-    receiveMessage = receiveMessageFrame(publicRing, privateRing)
+    sendMessage = sendMessageFrame(publicRing, privateRing, email,password)
+    receiveMessage = receiveMessageFrame(publicRing, privateRing, email, password)
 
     notebook.add(main_tab, text="Keys")
     notebook.add(sendMessage, text="Send Message")
@@ -29,15 +29,17 @@ def refreshPages():
     backButton = tk.Button(sendMessage, text="Log out", command=backToLogin)
     backButton.grid(row=0, column=0, sticky="nw", padx=10, pady=10)
 
+
 def updateLists():
     privateKeysList.set('')
-    privateKeysList['value']=list(privateRing[email].keys())
+    privateKeysList['value'] = list(privateRing[email].keys())
 
     publicKeysList.set('')
     publicKeysList['value'] = list(publicRing.keys())
 
     deletePairList.set('')
     deletePairList['value'] = list(publicRing.keys())
+
 
 def goToSimulation():
     notebook.forget(login_tab)
@@ -74,8 +76,8 @@ notebook = ttk.Notebook(window)
 login_tab = tk.Frame(notebook)
 notebook.add(login_tab, text="Login")
 
-sendMessage = sendMessageFrame(publicRing, privateRing,email)
-receiveMessage = receiveMessageFrame(publicRing, privateRing)
+sendMessage = sendMessageFrame(publicRing, privateRing, email,password)
+receiveMessage = receiveMessageFrame(publicRing, privateRing, email, password)
 viewRings = viewRingsFrame(publicRing, privateRing, email)
 main_tab = tk.Frame(notebook)
 
@@ -262,11 +264,11 @@ def privateAddToRing(input_text, top):
     top.destroy()
     # TODO: OVDE SE DODAJE U PRSTEN I SIFRUJE!
 
-    #ovo je samo proba za osvezavanje
+    # ovo je samo proba za osvezavanje
     if email not in privateRing.keys():
-        privateRing[email]={}
+        privateRing[email] = {}
 
-    privateRing[email][0]="janko"
+    privateRing[email][0] = "janko"
     #
     updateLists()
 
@@ -286,8 +288,6 @@ def importPublicKey():
 
         # TODO:Ovde dodamo u ring
         publicRing["janko"] = "janko"
-
-
 
         # Update padajuce liste
         updateLists()
@@ -351,9 +351,7 @@ importExportlabel = tk.Label(keyImportExport, text="Import/Export keys", font=("
 importExportlabel.grid(row=0, column=1, sticky="nw", padx=10, pady=10)
 
 publicKeys = []
-privateKeys =[]
-
-
+privateKeys = []
 
 
 # DELETING PAIR (in import/export)
@@ -366,7 +364,7 @@ def enableDelete(*args):
 
 
 def deletePair(key):
-    #TODO: Ovde brisanje
+    # TODO: Ovde brisanje
     updateLists()
     print(f"Deleted {key}")
 

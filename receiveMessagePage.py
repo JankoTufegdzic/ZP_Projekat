@@ -1,11 +1,15 @@
 import tkinter as tk
 from tkinter import ttk , messagebox,filedialog
+from main import  receiveMessage
 
-def receiveMessageFrame(publicRing,privateRing):
+def receiveMessageFrame(publicRing,privateRing,email,password):
 
     def selectMessage():
         file_path = filedialog.askopenfilename()
         if file_path:
+            receiveMessage(email,password,file_path)
+            #TODO: obrada prijema, bojenje labela,i promeniti receiveMessage da vraca vrednosti!
+
             authLabel.config(state="normal")
             encrLabel.config(state="normal")
             zipLabel.config(state="normal")
@@ -35,28 +39,28 @@ def receiveMessageFrame(publicRing,privateRing):
                 f.write(text.get("1.0","end-1c"))
 
 
-    receiveMessage=tk.Frame()
+    receiveMessageFrame=tk.Frame()
 
-    receiveMessage.grid_columnconfigure(0,weight=0)
-    receiveMessage.grid_columnconfigure(1,weight=1)
-    receiveMessage.grid_columnconfigure(2,weight=0)
+    receiveMessageFrame.grid_columnconfigure(0,weight=0)
+    receiveMessageFrame.grid_columnconfigure(1,weight=1)
+    receiveMessageFrame.grid_columnconfigure(2,weight=0)
 
-    receiveMessageLabel=tk.Label(receiveMessage,text="Receive Message" ,font=("Arial",16))
-    receiveMessageLabel.grid(row=0,column=1,sticky="w")
+    receiveMessageFrameLabel=tk.Label(receiveMessageFrame,text="Receive Message" ,font=("Arial",16))
+    receiveMessageFrameLabel.grid(row=0,column=1,sticky="w")
 
-    receiveMessageButton=tk.Button(receiveMessage,text="Receive",command=selectMessage)
-    receiveMessageButton.grid(row=0, column=2, sticky="e",pady=10,padx=10)
+    receiveMessageFrameButton=tk.Button(receiveMessageFrame,text="Receive",command=selectMessage)
+    receiveMessageFrameButton.grid(row=0, column=2, sticky="e",pady=10,padx=10)
 
-    authLabel = tk.Label(receiveMessage, text="Authentication", font=("Arial", 12),state="disabled")
+    authLabel = tk.Label(receiveMessageFrame, text="Authentication", font=("Arial", 12),state="disabled")
     authLabel.grid(row=1, column=0, sticky="nw", padx=10, pady=10)
-    encrLabel = tk.Label(receiveMessage, text="Encryption", font=("Arial", 12),state="disabled")
+    encrLabel = tk.Label(receiveMessageFrame, text="Encryption", font=("Arial", 12),state="disabled")
     encrLabel.grid(row=2, column=0, sticky="nw", padx=10, pady=10)
-    zipLabel = tk.Label(receiveMessage, text="ZIP", font=("Arial", 12),state="disabled")
+    zipLabel = tk.Label(receiveMessageFrame, text="ZIP", font=("Arial", 12),state="disabled")
     zipLabel.grid(row=3, column=0, sticky="nw", padx=10, pady=10)
-    base64Label = tk.Label(receiveMessage, text="Base64", font=("Arial", 12),state="disabled")
+    base64Label = tk.Label(receiveMessageFrame, text="Base64", font=("Arial", 12),state="disabled")
     base64Label.grid(row=4, column=0, sticky="nw", padx=10, pady=10)
 
-    signatureLabel=tk.Label(receiveMessage,font=("Arial",12))
+    signatureLabel=tk.Label(receiveMessageFrame,font=("Arial",12))
     signatureLabel.grid(row=1, column=1, padx=10, pady=10)
 
     #TODO: ROW 2 I 3 COLUMN 1 SU INFORMACIJE O POTPISIVACU, NEMA MNOGO POSLA SAMO DA VIDIMO STA CEMO I KAKO!
@@ -64,16 +68,16 @@ def receiveMessageFrame(publicRing,privateRing):
 
 
     #text
-    textLabel = tk.Label(receiveMessage, text="Text:", font=("Arial", 12),state="disabled")
+    textLabel = tk.Label(receiveMessageFrame, text="Text:", font=("Arial", 12),state="disabled")
     textLabel.grid(row=5, column=0, sticky="nw", padx=10, pady=10)
 
-    text = tk.Text(receiveMessage, height=3, width=70,state="disabled")
+    text = tk.Text(receiveMessageFrame, height=3, width=70,state="disabled")
     text.grid(row=5, column=1, padx=20)
 
     #save button
-    saveButton=tk.Button(receiveMessage,text="Save message",command=saveMessage,state="disabled")
+    saveButton=tk.Button(receiveMessageFrame,text="Save message",command=saveMessage,state="disabled")
     saveButton.grid(row=6,column=0,columnspan=4,padx=10,pady=10)
 
-    return receiveMessage
+    return receiveMessageFrame
 
 

@@ -94,7 +94,7 @@ def generateKeys(name,email,algo,size,password):
     saveKeyInPemFormat(publicKey, "test", algo)
 
 
-def sendMessage(email, password, msg, name, publicKeyAuthID=None, publicKeyEncrID=None, encrAlg=None):
+def sendMessage(email, password, msg, name, publicKeyAuthID=None, publicKeyEncrID=None, encrAlg=None,zip=False,base64encode=False):
     global privateRing, publicRing
     toSend = {}
     toSend["data"] = msg
@@ -117,7 +117,8 @@ def sendMessage(email, password, msg, name, publicKeyAuthID=None, publicKeyEncrI
         authMsg["algAuth"] = authAlg
         toSend = authMsg
 
-    toSend = zlib.compress(str(toSend).encode('utf-8'))
+    if zip:
+        toSend = zlib.compress(str(toSend).encode('utf-8'))
 
     if publicKeyEncrID is not None:
         encrMsg = {}
@@ -130,14 +131,15 @@ def sendMessage(email, password, msg, name, publicKeyAuthID=None, publicKeyEncrI
         encrMsg["algEncr"] = encrAlg
         toSend = encrMsg
 
-    toSend = base64.b64encode(str(toSend).encode('ascii')).decode('ascii')
+    if base64encode:
+        toSend = base64.b64encode(str(toSend).encode('ascii')).decode('ascii')
 
-    with open(f'msgs/{name}.json', "w") as sendmsg:
+    with open(name, "w") as sendmsg:
         sendmsg.write(str(toSend))
 
 
 def receiveMessage(email, password, name):
-    with open(f'msgs/{name}.json') as file:
+    with open(name) as file:
         toRecv = file.read()
 
     toRecv = base64.b64decode(toRecv.encode('ascii')).decode("ascii")
