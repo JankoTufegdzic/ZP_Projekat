@@ -6,8 +6,19 @@ from keyManipulation import *
 from msgAuth import *
 from msgEncr import *
 
+
+class Users:
+    def __init__(self, username, name):
+        self.username = username
+        self.name = name
+
+    def __str__(self):
+        return "username: " + str(self.username) + ", name: " + str(self.name)
+
+
 publicRing = {}
 privateRing = {}
+users = {}
 
 
 def deleteKeys(keyID, email):
@@ -36,45 +47,49 @@ def saveKeyInPemFormat(key, title, algo):
             if hasattr(key, 'x'):
                 toWrite["x"] = int(key.x)
             p.write("-----BEGIN ELGAMAL PUBLIC KEY-----\n".encode('utf-8'))
-            p.write(bytearray(str(toWrite).encode('utf-8')))
+            toWrite = base64.b64encode(str(toWrite).encode('ascii'))
+            p.write(toWrite)
             p.write("\n-----END ELGAMAL PUBLIC KEY-----".encode('utf-8'))
             p.close()
 
 
-def loadKeyFromPemFormat(title, email, password=None ):  # izmeniti za elgamal i dsa
+def loadKeyFromPemFormat(title, email, password=None):  # izmeniti za elgamal i dsa
     with open(title, 'rb') as p:
-        publicKey = None
+        algKeys = None
         firstLine = p.readline().decode('utf-8')
         if firstLine.find("RSA") != -1:
-            keys = RSA.import_key(p.read())
-            if keys.has_private():
-                publicKey = keys.public_key()
-                privateKey = keys
+            algKeys = RSA.import_key(p.read())
+            if algKeys.has_private():
+                publicKey = algKeys.public_key()
+                privateKey = algKeys
                 puID = publicKey.n
                 addToRings(email, password, privateKey, publicKey, puID, "RSA")
             else:
-                publicRing[keys.n % (2 ** 64)] = PublicRingStruct(keys, "RSA", email)
+                publicRing[algKeys.n % (2 ** 64)] = PublicRingStruct(algKeys, "RSA", email)
         elif firstLine.find("ELGAMAL") != -1:
-            keys = eval((p.readline()).decode('utf-8'))
-            if "x" in keys.keys:
-                privateKey = ElGamal.construct((int(keys["p"]), int(keys["g"]), int(keys["y"], int(keys["x"]))))
+            algKeys = eval(base64.b64decode(p.readline()).decode("ascii"))
+            print(algKeys)
+            # keys = eval((p.readline()).decode('utf-8'))
+            if "x" in algKeys:
+                privateKey = ElGamal.construct(
+                    (int(algKeys["p"]), int(algKeys["g"]), int(algKeys["y"]), int(algKeys["x"])))
                 publicKey = privateKey.publickey()
                 puID = publicKey.y
                 addToRings(email, password, privateKey, publicKey, puID, "ElGamal")
             else:
-                keys = ElGamal.construct((int(keys["p"]), int(keys["g"]), int(keys["y"])))
-                publicRing[int(keys.y) % (2 ** 64)] = PublicRingStruct(keys, "ElGamal", email)
+                keys = ElGamal.construct((int(algKeys["p"]), int(algKeys["g"]), int(algKeys["y"])))
+                publicRing[int(algKeys.y) % (2 ** 64)] = PublicRingStruct(keys, "ElGamal", email)
         elif firstLine.find("DSA") != -1:
-            keys = DSA.import_key(p.read())
-            if keys.has_private():
-                publicKey = keys.public_key()
-                privateKey = keys
+            algKeys = DSA.import_key(p.read())
+            if algKeys.has_private():
+                publicKey = algKeys.public_key()
+                privateKey = algKeys
                 puID = publicKey.y
                 addToRings(email, password, privateKey, publicKey, puID, "DSA")
             else:
-                publicRing[keys.y % (2 ** 64)] = PublicRingStruct(keys, "DSA", email)
+                publicRing[algKeys.y % (2 ** 64)] = PublicRingStruct(algKeys, "DSA", email)
         p.close()
-        return keys
+        return algKeys
 
 
 def addToRings(email, password, privateKey, publicKey, pubID, algo):
@@ -87,8 +102,7 @@ def addToRings(email, password, privateKey, publicKey, pubID, algo):
     publicRing[int(pubID) % (2 ** 64)] = PublicRingStruct(publicKey, algo, email)
 
 
-def generateKeys(name,email,algo,size,password):
-
+def generateKeys(name, email, algo, size, password):
     keys = None
 
     if algo == "RSA":
@@ -116,7 +130,8 @@ def generateKeys(name,email,algo,size,password):
     saveKeyInPemFormat(privateKey, "test", algo)
 
 
-def sendMessage(email, password, msg, name, publicKeyAuthID=None, publicKeyEncrID=None, encrAlg=None,zip=False,base64encode=False):
+def sendMessage(email, password, msg, name, publicKeyAuthID=None, publicKeyEncrID=None, encrAlg=None, zip=False,
+                base64encode=False):
     global privateRing, publicRing
     toSend = {}
     toSend["data"] = msg
@@ -191,7 +206,7 @@ def receiveMessage(email, password, name):
         toRecv = eval(toRecv.decode("utf-8"))
 
     if "zip" in toRecv.keys:
-        toRecv = eval(zlib.decompress(toRecv).decode('utf-8'))
+        toRecv = eval(zlib.decompress(toRecv['zip']).decode('utf-8'))
 
     if "digest" in toRecv:
         digest = toRecv["digest"]
@@ -212,7 +227,7 @@ def receiveMessage(email, password, name):
 
 if __name__ == '__main__':
     print('ZP Projekat v1.1')
-    generateKeys("iva", "iva", "DSA", 1024, "123")
+    generateKeys("iva", "iva", "ElGamal", 1024, "123")
     loadKeyFromPemFormat("test", "iva", "123")
     print(publicRing)
     print(privateRing)
