@@ -26,7 +26,11 @@ class PublicRingStruct:
         self.userID = userID
 
     def __str__(self):
-        return "Timestamp: " + str(self.timestamp) +"\nAlgorithm: " + self.alg + "\nUser: " + self.userID+"\n\n"
+        if self.alg=="RSA":
+            parametres="\ne: "+str(self.pu.e)+"\nn:"+str(self.pu.n)
+        else:
+            parametres = "\np: " + str(self.pu.p) + "\ng:" + str(self.pu.g)+ "\ny: "+str(self.pu.y)
+        return "Timestamp: " + str(self.timestamp) +"\nAlgorithm: " + self.alg + parametres+"\nUser: " + self.userID+"\n\n"
 
 
 def getHash(password):

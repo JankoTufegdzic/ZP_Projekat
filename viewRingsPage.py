@@ -39,7 +39,7 @@ def viewRingsFrame(publicRing:dict,privateRing:dict,email):
     for j in publicRing.keys():
         publicRingTable.insert(f"{k}.0", f"ID: {j}\n")
         publicRingTable.insert(f"{k+1}.0", f"{publicRing[j]}")#samo javni kljuc pise
-        k += 6
+        k += 30
 
     publicRingTable.config(state="disabled")
 
