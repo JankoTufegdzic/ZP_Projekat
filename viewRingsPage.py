@@ -74,7 +74,7 @@ def viewRingsFrame(publicRing:dict,privateRing:dict,email):
     for j in myPrivate.keys():
         privateRingTable.insert(f"{i}.0",f"ID: {j}\n")
         privateRingTable.insert(f"{i+1}.0", f"{myPrivate[j]}\n")
-        i += 5
+        i += 30
 
     privateRingTable.config(state="disabled")
 

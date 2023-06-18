@@ -16,9 +16,9 @@ class PrivateRingStruct:
 
     def __str__(self):
         if self.alg == "RSA":
-            parametres = "\ne: " + str(self.pu.e) + "\nn:" + str(self.pu.n)
+            parametres = "\ne: " + str(self.pu.e) + "\nn: " + str(self.pu.n)
         else:
-            parametres = "\np: " + str(self.pu.p) + "\ng:" + str(self.pu.g) + "\ny: " + str(self.pu.y)
+            parametres = "\np: " + str(self.pu.p) + "\ng: " + str(self.pu.g) + "\ny: " + str(self.pu.y)
         return "Timestamp: " + str(
             self.timestamp) + "\nAlgorithm: " + self.alg + parametres + "\n\n"
 
