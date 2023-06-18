@@ -91,10 +91,6 @@ def receiveMessageFrame(publicRing,privateRing,email,users):
     signatureLabel=tk.Label(receiveMessageFrame,font=("Arial",12))
     signatureLabel.grid(row=1, column=1, padx=10, pady=10)
 
-    #TODO: ROW 2 I 3 COLUMN 1 SU INFORMACIJE O POTPISIVACU, NEMA MNOGO POSLA SAMO DA VIDIMO STA CEMO I KAKO!
-
-
-
     #text
     textLabel = tk.Label(receiveMessageFrame, text="Text:", font=("Arial", 12),state="disabled")
     textLabel.grid(row=5, column=0, sticky="nw", padx=10, pady=10)
