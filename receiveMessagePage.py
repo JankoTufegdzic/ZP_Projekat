@@ -57,6 +57,7 @@ def receiveMessageFrame(publicRing,privateRing,email,users):
 
                 text.insert("2.0", "User: "+ f' {us.name} "{us.username}" '+"\n")
             text.insert("3.0", "Data: "+toRecv["data"]+"\n")
+            text.config(state="disabled")
 
     def saveMessage():
         file_path = filedialog.asksaveasfilename(defaultextension=".txt")
