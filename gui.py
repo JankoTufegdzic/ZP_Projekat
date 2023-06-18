@@ -20,7 +20,7 @@ class User:
         return "username: " + str(self.username) + ", name: " + str(self.name)
 
 
-users=[User("j","janko"),User("i","iva")]
+users=[User("janko@email.com","Janko"),User("iva@email.com","iva"),User("zp@email.com","Zastitnik"),User("inz@email.com","Inzenjer")]
 
 def refreshPages():
     global viewRings, sendMessage, receiveMessage, email
