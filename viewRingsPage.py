@@ -20,10 +20,12 @@ def viewRingsFrame(publicRing:dict,privateRing:dict,email):
     myPrivate=privateRing.get(email)
     if myPrivate is None:
         myPrivate={}
-    i=0
+
+    i=1
     for j in myPrivate.keys():
-        privateRingTable.insert(f"{i}.0",f"{myPrivate[j]}\n") #samo javni kljuc pise
-        i+=1
+        privateRingTable.insert(f"{i}.0",f"ID: {j}\n")
+        privateRingTable.insert(f"{i+1}.0", f"{myPrivate[j]}\n")
+        i += 5
 
     privateRingTable.config(state="disabled")
 
@@ -33,10 +35,11 @@ def viewRingsFrame(publicRing:dict,privateRing:dict,email):
     publicRingTable = tk.Text(viewRings, height=10, width=80)
     publicRingTable.pack(anchor="nw", padx=10, pady=10)
 
-    i=0
+    k=1
     for j in publicRing.keys():
-        publicRingTable.insert(f"{i}.0", f"{publicRing[j]}\n")#samo javni kljuc pise
-        i += 1
+        publicRingTable.insert(f"{k}.0", f"ID: {j}\n")
+        publicRingTable.insert(f"{k+1}.0", f"{publicRing[j]}")#samo javni kljuc pise
+        k += 6
 
     publicRingTable.config(state="disabled")
 

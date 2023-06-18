@@ -390,7 +390,11 @@ def enableDelete(*args):
 
 def deletePair(key):
     deleteKeys(key,email)
-    updateLists()
+
+    notebook.forget(sendMessage)
+    notebook.forget(viewRings)
+    notebook.forget(receiveMessage)
+    refreshPages()
     print(f"Deleted {key}")
 
 

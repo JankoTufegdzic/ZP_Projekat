@@ -1,6 +1,5 @@
 from Cryptodome.Cipher import CAST
 from Cryptodome.Hash import SHA1
-import rsa
 
 from Cryptodome.PublicKey import DSA, ElGamal, RSA
 from Cryptodome.Random import get_random_bytes
@@ -9,14 +8,14 @@ import datetime
 
 class PrivateRingStruct:
     def __init__(self, pu, pr, alg, password):
-        self.timestamp = datetime.datetime.now()
+        self.timestamp = str(datetime.datetime.now())
         self.pu = pu
         self.pr = pr
         self.alg = alg
         self.password = password
 
     def __str__(self):
-        return "ts: " + str(self.timestamp) + ", PU: " + str(self.pu) + ", PR: " + str(self.pr) + ", alg: " + self.alg
+        return "Timestamp: " + self.timestamp + "\nAlgorithm: " + self.alg +"\n\n"
 
 
 class PublicRingStruct:
@@ -27,7 +26,7 @@ class PublicRingStruct:
         self.userID = userID
 
     def __str__(self):
-        return "ts: " + str(self.timestamp) + ", PU: " + str(self.pu) + ", alg: " + self.alg + ", user: " + self.userID
+        return "Timestamp: " + str(self.timestamp) +"\nAlgorithm: " + self.alg + "\nUser: " + self.userID+"\n\n"
 
 
 def getHash(password):
