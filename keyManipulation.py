@@ -86,12 +86,10 @@ def decryptPrivateKey(password, key, hashedPass, algo):
 
 
 def generateKeysRSA(size):
-    return RSA.generate(size)#rsa.newkeys(size)
-
+    return RSA.generate(size)
 
 def generateKeysDSA(size):
     return DSA.generate(size)
-
 
 def generateKeysElGamal(size):
     return ElGamal.generate(size, get_random_bytes)

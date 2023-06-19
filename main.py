@@ -1,12 +1,11 @@
-
 import base64
-import binascii
-import time
 import zlib
 
 from keyManipulation import *
 from msgAuth import *
 from msgEncr import *
+import tkinter as tk
+
 
 publicRing = {}
 privateRing = {}
@@ -39,7 +38,6 @@ def saveKeyInPemFormat(key, title, algo):
                 toWrite["x"] = int(key.x)
             p.write("-----BEGIN ELGAMAL PUBLIC KEY-----\n".encode('utf-8'))
             toWrite = base64.b64encode(str(toWrite).encode('ascii'))
-            # toWrite = str(toWrite).encode('utf-8')
             p.write(toWrite)
             p.write("\n-----END ELGAMAL PUBLIC KEY-----".encode('utf-8'))
             p.close()
@@ -60,8 +58,6 @@ def loadKeyFromPemFormat(title, email, password=None):  # izmeniti za elgamal i 
                 publicRing[algKeys.n % (2 ** 64)] = PublicRingStruct(algKeys, "RSA", email)
         elif firstLine.find("ELGAMAL") != -1:
             algKeys = eval(base64.b64decode(p.readline()).decode("ascii"))
-            # print(algKeys)
-            # algKeys = eval((p.readline()).decode('utf-8'))
             if "x" in algKeys:
                 privateKey = ElGamal.construct(
                     (int(algKeys["p"]), int(algKeys["g"]), int(algKeys["y"]), int(algKeys["x"])))
@@ -139,7 +135,6 @@ def sendMessage(email, password, msg, name, publicKeyAuthID=None, publicKeyEncrI
         authMsg = {}
         authMsg["data"] = toSend
         authMsg["digest"] = msgAuth(toSend, privateKeyAuth, authAlg)
-        authMsg["octets"] = None
         authMsg["authKeyID"] = publicKeyAuthID
         authMsg["tsAuth"] = datetime.datetime.now()
         authMsg["algAuth"] = authAlg
@@ -154,7 +149,6 @@ def sendMessage(email, password, msg, name, publicKeyAuthID=None, publicKeyEncrI
         encrMsg = {}
         print(bytearray(str(toSend).encode("utf-8")))
         kS, encrMsg["data"], encrMsg["iv"] = encryptMsg(toSend, encrAlg)
-        # print(kS)
         encrMsg["encrKeyID"] = publicKeyEncrID
         publicKeyEncr = publicRing[publicKeyEncrID].pu
         encrMsg["ks"] = encryptKs(kS, publicKeyEncr, publicRing[publicKeyEncrID].alg)
@@ -173,13 +167,10 @@ def sendMessage(email, password, msg, name, publicKeyAuthID=None, publicKeyEncrI
     return True
 
 
-import tkinter as tk
-
-
 def openPrompt(id):
     top = tk.Toplevel()
 
-    top.geometry("200x100")
+    top.geometry("300x100")
     top.title("Enter password")
 
     entry_label = tk.Label(top, text=f'Enter password for key {id}')
@@ -193,9 +184,7 @@ def openPrompt(id):
     ok_button.pack(pady=10, fill="x", padx=20)
     top.wait_window()
 
-
 globalPass = ""
-
 
 def insertPassword(passw, top):
     global globalPass
@@ -233,10 +222,7 @@ def receiveMessage(email, password, name):
         privateKey = tmp.pr
         hashedPassword = tmp.password
 
-        #
-
         openPrompt(decrKeyID)
-        #
 
         privateKey = decryptPrivateKey(globalPass, privateKey, hashedPassword, tmp.alg)
         if privateKey is None:
@@ -255,7 +241,6 @@ def receiveMessage(email, password, name):
     if "digest" in toRecv:
         auth = True
         digest = toRecv["digest"]
-        octets = toRecv["octets"]
         authKeyID = toRecv["authKeyID"]
         ts = toRecv["tsAuth"]
         algAuth = toRecv["algAuth"]

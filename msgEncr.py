@@ -24,7 +24,6 @@ def encryptMsg(msg, alg):
         cipher = AES.new(kS, AES.MODE_CBC)
         eMsg = cipher.encrypt(pad(ba, AES.block_size))
         iv = cipher.iv
-        print(iv)
 
     return kS, eMsg, iv
 

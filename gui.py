@@ -5,11 +5,12 @@ from receiveMessagePage import receiveMessageFrame
 from sendMessagePage import sendMessageFrame
 from viewRingsPage import viewRingsFrame
 
-from main import generateKeys, privateRing, publicRing,loadKeyFromPemFormat,saveKeyInPemFormat,deleteKeys
-from keyManipulation import getHash,decryptPrivateKey
+from main import generateKeys, privateRing, publicRing, loadKeyFromPemFormat, saveKeyInPemFormat, deleteKeys
+from keyManipulation import getHash, decryptPrivateKey
 
 email = None
 password = None
+
 
 class User:
     def __init__(self, username, name):
@@ -20,14 +21,16 @@ class User:
         return "username: " + str(self.username) + ", name: " + str(self.name)
 
 
-users=[User("janko@email.com","Janko"),User("iva@email.com","iva"),User("zp@email.com","Zastitnik"),User("inz@email.com","Inzenjer")]
+users = [User("janko@email.com", "Janko"), User("iva@email.com", "Iva"), User("zp@email.com", "Zastitnik"),
+         User("inz@email.com", "Inzenjer")]
+
 
 def refreshPages():
     global viewRings, sendMessage, receiveMessage, email
 
     viewRings = viewRingsFrame(publicRing, privateRing, email)
-    sendMessage = sendMessageFrame(publicRing, privateRing, email,password)
-    receiveMessage = receiveMessageFrame(publicRing, privateRing, email,users)
+    sendMessage = sendMessageFrame(publicRing, privateRing, email, password)
+    receiveMessage = receiveMessageFrame(publicRing, privateRing, email, users)
 
     notebook.add(main_tab, text="Keys")
     notebook.add(sendMessage, text="Send Message")
@@ -63,13 +66,10 @@ def goToSimulation():
 def onLogin():
     global email
     email = login_username_entry.get()
-
-
     login_username_var.set("")
 
-    #TODO: dodacemo niz sa userima,da se proveri da li postoji user.
     for user in users:
-        if user.username==email:
+        if user.username == email:
             email_var.set(email)
             email_entry.config(state="readonly")
             username_var.set(user.name)
@@ -79,7 +79,6 @@ def onLogin():
             return
 
     errorLabel.grid(row=6, column=0, columnspan=2, padx=10, pady=10)
-
 
 
 def backToLogin():
@@ -101,8 +100,8 @@ notebook = ttk.Notebook(window)
 login_tab = tk.Frame(notebook)
 notebook.add(login_tab, text="Login")
 
-sendMessage = sendMessageFrame(publicRing, privateRing, email,password)
-receiveMessage = receiveMessageFrame(publicRing, privateRing, email,users)
+sendMessage = sendMessageFrame(publicRing, privateRing, email, password)
+receiveMessage = receiveMessageFrame(publicRing, privateRing, email, users)
 viewRings = viewRingsFrame(publicRing, privateRing, email)
 main_tab = tk.Frame(notebook)
 
@@ -133,18 +132,16 @@ login_email_label = tk.Label(login_tab, text="Email:", font=("Arial", 12))
 
 login_email_label.grid(row=3, column=0, padx=10, pady=10, sticky="e")
 
-
 login_username_var = tk.StringVar()
 login_username_entry = tk.Entry(login_tab, font=("Arial", 12), textvariable=login_username_var)
 login_username_entry.grid(row=3, column=1, padx=10, pady=5)
 
 login_username_var.trace("w", validate_entries)
 
-
 login_button = tk.Button(login_tab, text="Login", command=onLogin, font=("Arial", 16, "bold"), state=tk.DISABLED)
 login_button.grid(row=5, column=0, columnspan=2, padx=10, pady=10)
 
-errorLabel=tk.Label(login_tab,text="User does not exists!",fg="red",font=("Arial", 12))
+errorLabel = tk.Label(login_tab, text="User does not exists!", fg="red", font=("Arial", 12))
 errorLabel.grid(row=6, column=0, columnspan=2, padx=10, pady=10)
 errorLabel.grid_forget()
 
@@ -281,18 +278,15 @@ def importPrivateKey():
         entry = tk.Entry(top, textvariable=entry_var, show="*")
         entry.pack()
 
-        ok_button = tk.Button(top, text='OK', command=lambda: privateAddToRing(entry_var.get(), top,file_path))
+        ok_button = tk.Button(top, text='OK', command=lambda: privateAddToRing(entry_var.get(), top, file_path))
         ok_button.pack(pady=10, fill="x", padx=20)
 
 
-def privateAddToRing(passw, top,file):
+def privateAddToRing(passw, top, file):
     global privateRing, email
     top.destroy()
 
-    loadKeyFromPemFormat(file,email,passw)
-
-
-    updateLists()
+    loadKeyFromPemFormat(file, email, passw)
 
     notebook.forget(sendMessage)
     notebook.forget(viewRings)
@@ -308,15 +302,13 @@ def importPublicKey():
     if file_path:
         print("Selected file:", file_path)
 
-        loadKeyFromPemFormat(file_path,email)
-
-        # Update padajuce liste
-        updateLists()
+        loadKeyFromPemFormat(file_path, email)
 
         notebook.forget(sendMessage)
         notebook.forget(viewRings)
         notebook.forget(receiveMessage)
         refreshPages()
+
         messagebox.showinfo('Result', "Import successful")
 
 
@@ -337,7 +329,7 @@ def enablePublic(*args):
 def exportPublic():
     file_path = filedialog.asksaveasfilename(defaultextension=".pem")
     if file_path:
-        saveKeyInPemFormat(publicRing[int(publicKey_var.get())].pu,file_path,publicRing[int(publicKey_var.get())].alg)
+        saveKeyInPemFormat(publicRing[int(publicKey_var.get())].pu, file_path, publicRing[int(publicKey_var.get())].alg)
         print("Exporting to:", file_path)
 
 
@@ -359,16 +351,17 @@ def exportPrivate():
 
 def checkPassword(input_text, top):
     top.destroy()
-    hp,hashedPass=getHash(input_text)
+    hp, hashedPass = getHash(input_text)
     if hp != privateRing[email][int(privateKey_var.get())].password:
         messagebox.showinfo('Result', "Wrong password!")
     else:
         file_path = filedialog.asksaveasfilename(defaultextension=".pem")
         if file_path:
-            key=decryptPrivateKey(input_text,privateRing[email][int(privateKey_var.get())].pr,hp,privateRing[email][int(privateKey_var.get())].alg)
+            key = decryptPrivateKey(input_text, privateRing[email][int(privateKey_var.get())].pr, hp,
+                                    privateRing[email][int(privateKey_var.get())].alg)
             if key is None:
                 return
-            saveKeyInPemFormat(key,file_path,privateRing[email][int(privateKey_var.get())].alg)
+            saveKeyInPemFormat(key, file_path, privateRing[email][int(privateKey_var.get())].alg)
             print("Exporting to:", file_path)
 
 
@@ -389,12 +382,13 @@ def enableDelete(*args):
 
 
 def deletePair(key):
-    deleteKeys(key,email)
+    deleteKeys(key, email)
 
     notebook.forget(sendMessage)
     notebook.forget(viewRings)
     notebook.forget(receiveMessage)
     refreshPages()
+
     print(f"Deleted {key}")
 
 

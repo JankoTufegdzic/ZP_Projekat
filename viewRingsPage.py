@@ -49,6 +49,7 @@ def viewRingsFrame(publicRing:dict,privateRing:dict,email):
         else:
             messagebox.showerror("Error","Wrong password!")
         top.destroy()
+
     viewRings=tk.Frame()
 
     viewRingsLabel=tk.Label(viewRings,text="View rings",font=("Arial",16))
@@ -71,6 +72,7 @@ def viewRingsFrame(publicRing:dict,privateRing:dict,email):
         myPrivate={}
 
     i=1
+
     for j in myPrivate.keys():
         privateRingTable.insert(f"{i}.0",f"ID: {j}\n")
         privateRingTable.insert(f"{i+1}.0", f"{myPrivate[j]}\n")
@@ -87,7 +89,7 @@ def viewRingsFrame(publicRing:dict,privateRing:dict,email):
     k=1
     for j in publicRing.keys():
         publicRingTable.insert(f"{k}.0", f"ID: {j}\n")
-        publicRingTable.insert(f"{k+1}.0", f"{publicRing[j]}")#samo javni kljuc pise
+        publicRingTable.insert(f"{k+1}.0", f"{publicRing[j]}")
         k += 30
 
     publicRingTable.config(state="disabled")
