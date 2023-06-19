@@ -1,4 +1,3 @@
-import rsa
 from Cryptodome.Hash import SHA1
 from Cryptodome.Signature import DSS, pkcs1_15
 
